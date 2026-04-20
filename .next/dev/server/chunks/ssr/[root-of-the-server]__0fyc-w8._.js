@@ -115,13 +115,13 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2
 ;
 ;
 const firebaseConfig = {
-    apiKey: "AIzaSyAOwiC-UjjYXDZ3rymcSh0gN3bhsfmUiZo",
-    authDomain: "battlefire-arena.firebaseapp.com",
-    databaseURL: "https://battlefire-arena-default-rtdb.firebaseio.com",
-    projectId: "battlefire-arena",
-    storageBucket: "battlefire-arena.firebasestorage.app",
-    messagingSenderId: "571922400958",
-    appId: "1:571922400958:web:662de92861b7680251c0ef"
+    apiKey: "AIzaSyBvNrJ0ZqlR2QBhfRBcv2wPISaZjzNwUsg",
+    authDomain: "tournament-app-41636.firebaseapp.com",
+    databaseURL: "https://tournament-app-41636-default-rtdb.firebaseio.com",
+    projectId: "tournament-app-41636",
+    storageBucket: "tournament-app-41636.firebasestorage.app",
+    messagingSenderId: "262504693288",
+    appId: "1:262504693288:web:70883aa0ee6a3d13887f1d"
 };
 const app = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$app$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getApps"])().length === 0 ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$app$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["initializeApp"])(firebaseConfig) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$app$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getApp"])();
 const db = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$common$2d$82d44573$2e$node$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__b6__as__initializeFirestore$3e$__["initializeFirestore"])(app, {
