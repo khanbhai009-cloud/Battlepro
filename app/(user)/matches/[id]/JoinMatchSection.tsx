@@ -31,7 +31,7 @@ export function JoinMatchSection({
   const isTaken = (slot: number) => joinedSlots.includes(slot);
   const isDisabled = matchStatus === "ended" || userAlreadyJoined;
 
-  const handleJoin = async () => {
+    const handleJoin = async () => {
     if (!selectedSlot || !ffName.trim() || !ffUid.trim()) {
       setResult({ success: false, message: "Please fill in all fields and select a slot." });
       return;
@@ -41,11 +41,13 @@ export function JoinMatchSection({
     setResult(null);
 
     try {
-      const res = await joinMatch(matchId, userId, selectedSlot, ffName.trim(), ffUid.trim());
+      // Type assertion add kar diya yahan
+      const res = await joinMatch(matchId, userId, selectedSlot, ffName.trim(), ffUid.trim()) as { success: boolean; error?: string };
+      
       if (res.success) {
         setResult({ success: true, message: `You've joined Slot #${selectedSlot}! Good luck, warrior!` });
       } else {
-        setResult({ success: false, message: res.error ?? "Failed to join. Please try again." });
+        setResult({ success: false, message: res.error || "Failed to join. Please try again." });
       }
     } catch {
       setResult({ success: false, message: "Something went wrong. Please try again." });
@@ -53,6 +55,7 @@ export function JoinMatchSection({
       setLoading(false);
     }
   };
+
 
   if (matchStatus === "ended") {
     return (
