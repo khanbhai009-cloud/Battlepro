@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Trophy, Wallet, User, BarChart3, LogOut } from "lucide-react";
+import { Home, Trophy, Wallet, User, BarChart3, LogOut, Headset } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "./NotificationBell";
 import { destroySession } from "@/actions/session";
-
-const TEMP_MOCK_USER_ID = "user123";
 
 const navItems = [
   { label: "Home", href: "/home", icon: Home },
@@ -15,15 +13,17 @@ const navItems = [
   { label: "Rank", href: "/rank", icon: BarChart3 },
   { label: "Wallet", href: "/wallet", icon: Wallet },
   { label: "Profile", href: "/profile", icon: User },
+  { label: "Support", href: "/support", icon: Headset },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const bottomItems = navItems.slice(0, 5);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border sm:hidden">
       <div className="flex justify-around items-center px-2 py-2 pb-[env(safe-area-inset-bottom,8px)]">
-        {navItems.map((item) => {
+        {bottomItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href);
           return (
@@ -50,7 +50,7 @@ export function BottomNav() {
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ userId }: { userId: string }) {
   const pathname = usePathname();
 
   return (
@@ -59,7 +59,7 @@ export function Sidebar() {
         <div className="text-lg font-extrabold tracking-tight text-foreground">
           BATTLEZONE <span className="text-primary">PRO</span>
         </div>
-        <NotificationBell userId={TEMP_MOCK_USER_ID} />
+        <NotificationBell userId={userId} />
       </div>
 
       <nav className="flex flex-col gap-0.5 flex-1">

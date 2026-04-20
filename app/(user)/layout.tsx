@@ -1,30 +1,31 @@
 import { Sidebar, BottomNav } from "@/components/user/Navigation";
 import { AppStatusListener } from "@/components/user/AppStatusListener";
 import { NotificationsProvider } from "@/components/user/NotificationsProvider";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-const TEMP_USER_ID = "user123";
-
-export default function UserLayout({
+export default async function UserLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const userId = cookieStore.get("session")?.value;
+  if (!userId) redirect("/login");
+
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       <AppStatusListener />
-      <NotificationsProvider userId={TEMP_USER_ID} />
+      <NotificationsProvider userId={userId} />
 
-      {/* Desktop Sidebar — hidden on mobile */}
-      <Sidebar />
+      <Sidebar userId={userId} />
 
-      {/* Main content area */}
       <main className="flex-1 h-full overflow-y-auto relative">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-24 sm:pb-8">
           {children}
         </div>
       </main>
 
-      {/* Mobile Bottom Nav — visible only on mobile */}
       <BottomNav />
     </div>
   );

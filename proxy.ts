@@ -39,7 +39,7 @@ export function proxy(request: NextRequest) {
   }
 
   // 5. Protect Player App routes
-  const protectedUserRoutes = ["/home", "/matches", "/wallet", "/profile", "/rank"];
+  const protectedUserRoutes = ["/home", "/matches", "/wallet", "/profile", "/rank", "/support"];
   if (protectedUserRoutes.some(route => pathname.startsWith(route))) {
     if (!sessionToken) {
       return NextResponse.redirect(new URL("/login", request.url));
@@ -59,6 +59,7 @@ export const config = {
     "/profile/:path*",
     "/rank",
     "/rank/:path*",
+    "/support/:path*",
     "/login",
     "/register",
   ],

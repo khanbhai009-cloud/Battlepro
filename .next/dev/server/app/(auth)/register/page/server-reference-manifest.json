@@ -1,6 +1,6 @@
 {
   "node": {
-    "7050d8a1de2d18b3ee77a26eee52f20c028eaa0477": {
+    "70cc28e4e7c6ce73b8c373dd1900f40600b7ffd6e9": {
       "workers": {
         "app/(auth)/register/page": {
           "moduleId": "[project]/.next-internal/server/app/(auth)/register/page/actions.js { ACTIONS_MODULE0 => \"[project]/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/actions/session.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -12,7 +12,7 @@
       "exportedName": "registerNewUser",
       "filename": "actions/auth.ts"
     },
-    "40e1d2df48a1cd82a52ee27e49848f4419726fdb9f": {
+    "40bb5d90bb7d98e3653e95f5071c49b3b3639f2874": {
       "workers": {
         "app/(auth)/register/page": {
           "moduleId": "[project]/.next-internal/server/app/(auth)/register/page/actions.js { ACTIONS_MODULE0 => \"[project]/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/actions/session.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",

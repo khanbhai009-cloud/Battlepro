@@ -13,16 +13,13 @@ const razorpay = new Razorpay({
 export async function createOrder(amount: number, userId: string) {
   try {
     const options = {
-      amount: amount * 100, // amount in the smallest currency unit
+      amount: amount * 100,
       currency: "INR",
       receipt: `receipt_${Date.now()}`,
-      notes: {
-        userId,
-      },
+      notes: { userId },
     };
-
     const order = await razorpay.orders.create(options);
-    return { success: true, order };
+    return { success: true, order, keyId: process.env.RAZORPAY_KEY_ID };
   } catch (error) {
     console.error("Razorpay Order Error:", error);
     return { success: false, error: "Failed to create order" };
@@ -46,10 +43,9 @@ export async function verifyPayment(
     const isAuthentic = expectedSignature === razorpay_signature;
 
     if (isAuthentic) {
-      // Atomic increment of user wallet using Admin SDK
       const adminDb = getAdminDb();
       const userRef = adminDb.collection("users").doc(userId);
-      
+
       await adminDb.runTransaction(async (transaction) => {
         const userDoc = await transaction.get(userRef);
         if (!userDoc.exists) throw new Error("User not found");
@@ -62,7 +58,6 @@ export async function verifyPayment(
           lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
         });
 
-        // Log transaction
         const txnRef = adminDb.collection("transactions").doc();
         transaction.set(txnRef, {
           userId,
@@ -77,6 +72,8 @@ export async function verifyPayment(
       });
 
       revalidatePath("/wallet");
+      revalidatePath("/home");
+      revalidatePath("/profile");
       return { success: true };
     } else {
       return { success: false, error: "Invalid signature" };

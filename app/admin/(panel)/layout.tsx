@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Trophy, Settings, Banknote, ShieldAlert, Menu, X } from "lucide-react";
+import { LayoutDashboard, Users, Trophy, Settings, Banknote, ShieldAlert, Menu, X, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { destroySession } from "@/actions/session";
@@ -12,6 +12,7 @@ const adminNavItems = [
   { label: "Tournaments", href: "/admin/tournaments", icon: Trophy },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Withdrawals", href: "/admin/withdrawals", icon: Banknote },
+  { label: "Support", href: "/admin/support", icon: MessageCircle },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
@@ -21,12 +22,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <aside className={cn(
         "fixed lg:static inset-y-0 left-0 z-40 flex flex-col w-[240px] h-screen bg-gray-900 text-gray-300 shrink-0 transition-transform duration-200",
         sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
@@ -39,12 +38,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <nav className="flex flex-col gap-0.5 px-3 flex-1">
-          <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-2 mb-2">
-            Management
-          </div>
+          <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-2 mb-2">Management</div>
           {adminNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+            const isActive = pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}
@@ -64,17 +61,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div className="px-3 pb-5">
           <form action={destroySession}>
-            <button
-              type="submit"
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-900/30 transition-colors"
-            >
+            <button type="submit" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-900/30 transition-colors">
               Logout
             </button>
           </form>
         </div>
       </aside>
 
-      {/* Main Area */}
       <main className="flex-1 h-full overflow-y-auto flex flex-col min-w-0">
         <header className="sticky top-0 bg-white border-b border-border h-14 flex items-center justify-between px-4 sm:px-6 z-20 shrink-0">
           <div className="flex items-center gap-3">
@@ -86,9 +79,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-sm font-bold leading-none">Super Admin</span>
-              <span className="text-[10px] text-muted">admin@battlezone.com</span>
+              <span className="text-[10px] text-muted">BattleZone Pro</span>
             </div>
-            <div className="h-8 w-8 rounded-full bg-gray-900 border-2 border-white shadow-sm shrink-0" />
+            <div className="h-8 w-8 rounded-full bg-gray-900 border-2 border-white shadow-sm shrink-0 flex items-center justify-center text-white text-xs font-bold">A</div>
           </div>
         </header>
 

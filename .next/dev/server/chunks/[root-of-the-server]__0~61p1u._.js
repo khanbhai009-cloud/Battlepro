@@ -113,7 +113,8 @@ function proxy(request) {
         "/matches",
         "/wallet",
         "/profile",
-        "/rank"
+        "/rank",
+        "/support"
     ];
     if (protectedUserRoutes.some((route)=>pathname.startsWith(route))) {
         if (!sessionToken) {
@@ -132,6 +133,7 @@ const config = {
         "/profile/:path*",
         "/rank",
         "/rank/:path*",
+        "/support/:path*",
         "/login",
         "/register"
     ]
