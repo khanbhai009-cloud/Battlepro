@@ -1,5 +1,42 @@
 {
-  "node": {},
+  "node": {
+    "40b562022d95993403e511179514e53942d99b8339": {
+      "workers": {
+        "app/(auth)/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/(auth)/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/actions/session.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createSession",
+          "filename": "actions/session.ts"
+        },
+        "app/(auth)/register/page": {
+          "moduleId": "[project]/.next-internal/server/app/(auth)/register/page/actions.js { ACTIONS_MODULE0 => \"[project]/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/actions/session.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createSession",
+          "filename": "actions/session.ts"
+        },
+        "app/admin/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/admin/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/actions/session.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createSession",
+          "filename": "actions/session.ts"
+        }
+      },
+      "filename": "actions/session.ts",
+      "exportedName": "createSession"
+    },
+    "70e56819f24641720bfc52a81e8cae5e95fa6208cf": {
+      "workers": {
+        "app/(auth)/register/page": {
+          "moduleId": "[project]/.next-internal/server/app/(auth)/register/page/actions.js { ACTIONS_MODULE0 => \"[project]/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/actions/session.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "registerNewUser",
+          "filename": "actions/auth.ts"
+        }
+      },
+      "filename": "actions/auth.ts",
+      "exportedName": "registerNewUser"
+    }
+  },
   "edge": {},
-  "encryptionKey": "MYBQ8v4l37FUPBx4/MpO+VQKDhvhmzf+8XPElKHx7+4="
+  "encryptionKey": "1iGN3syX/OsPIR1vBhR20s0dk+z3mA3AT/H6/uy4tz8="
 }
