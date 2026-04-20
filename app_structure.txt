@@ -1,0 +1,58 @@
+/app
+  layout.tsx          (Global Layout)
+  page.tsx            (Landing/Redirect)
+  globals.css         (Tailwind Imports)
+  middleware.ts       (Route Protection)
+  /(auth)             (Auth Group)
+    login
+      page.tsx
+    register
+      page.tsx
+  /(user)             (Player App Group)
+    layout.tsx        (Bottom Navigation)
+    home
+      page.tsx
+    matches
+      page.tsx
+      [id]
+        page.tsx      (Match Details)
+    wallet
+      page.tsx
+    profile
+      page.tsx
+  /(staff)            (Moderator Panel Group)
+    layout.tsx        (Dashboard Sidebar)
+    dashboard
+      page.tsx
+    matches
+      page.tsx
+  /(admin)            (Super Admin Group)
+    layout.tsx        (Full Sidebar)
+    dashboard
+      page.tsx
+    users
+      page.tsx
+    settings
+      page.tsx
+  /api                (Backend API Routes)
+    razorpay
+      webhook
+        route.ts
+/actions              (Server Actions)
+  auth.ts
+  match.ts
+  wallet.ts
+/components           (UI Components)
+  ui
+    Skeleton.tsx
+    Button.tsx
+    Card.tsx
+  user
+    BottomNav.tsx
+  admin
+    Sidebar.tsx
+/lib                  (Shared Utilities)
+  firebase-admin.ts   (Admin SDK)
+  firebase-client.ts  (Client SDK)
+  razorpay.ts
+  utils.ts
