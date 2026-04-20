@@ -2,36 +2,77 @@
 
 @theme {
   --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --color-background: #f8f9fa;
+  --color-foreground: #1a1a1a;
+  --color-card: #ffffff;
+  --color-card-foreground: #1a1a1a;
+  --color-primary: #2563eb;
+  --color-primary-foreground: #ffffff;
+  --color-muted: #6b7280;
+  --color-muted-foreground: #9ca3af;
+  --color-border: #e5e7eb;
+  --color-ring: #2563eb;
 }
 
 :root {
   --background: #f8f9fa;
   --foreground: #1a1a1a;
   --card: #ffffff;
-  --card-foreground: #1a1a1a;
   --primary: #2563eb;
-  --primary-foreground: #ffffff;
   --muted: #6b7280;
   --muted-foreground: #9ca3af;
   --border: #e5e7eb;
   --wallet-bg: #1a1a1a;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
 }
 
+/* ─── Auth Input ─────────────────────────────────── */
+.auth-input {
+  width: 100%;
+  background: #f9fafb;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--foreground);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.auth-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  background: #ffffff;
+}
+
+.auth-input::placeholder {
+  color: var(--muted-foreground);
+  font-weight: 400;
+}
+
+/* ─── Card ───────────────────────────────────────── */
 .card-base {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   padding: 1.25rem;
-  transition: transform 0.1s ease;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
+/* ─── Wallet Card ────────────────────────────────── */
 .wallet-card {
   background: var(--wallet-bg);
   color: white;
@@ -48,10 +89,11 @@ body {
   top: -1.25rem;
   width: 6.25rem;
   height: 6.25rem;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 50%;
 }
 
+/* ─── Button ─────────────────────────────────────── */
 .btn-primary {
   background: var(--primary);
   color: white;
@@ -70,6 +112,7 @@ body {
   transform: scale(0.98);
 }
 
+/* ─── Status Chips ───────────────────────────────── */
 .status-chip {
   display: inline-flex;
   align-items: center;
@@ -91,7 +134,7 @@ body {
   color: #2563eb;
 }
 
-/* Skeleton shimmer */
+/* ─── Skeleton Shimmer ───────────────────────────── */
 .skeleton-shimmer {
   background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
   background-size: 200% 100%;
@@ -101,4 +144,14 @@ body {
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+
+/* ─── Mobile Safe Area ───────────────────────────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 4rem);
+  }
+  .bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }

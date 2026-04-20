@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
-import { LayoutDashboard, Users, Trophy, Settings, Banknote, ShieldAlert } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { LayoutDashboard, Users, Trophy, Settings, Banknote, ShieldAlert, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const adminNavItems = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -15,31 +19,54 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <div className="flex h-screen bg-[#f8f9fa] overflow-hidden">
-      {/* Admin Sidebar */}
-      <aside className="flex flex-col w-[260px] h-screen bg-gray-900 text-gray-300 shrink-0">
-        <div className="flex items-center gap-3 p-6 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <ShieldAlert size={18} className="text-white" />
+    <div className="flex h-screen bg-background overflow-hidden">
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "fixed lg:static inset-y-0 left-0 z-40 flex flex-col w-[240px] h-screen bg-gray-900 text-gray-300 shrink-0 transition-transform duration-200",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        )}
+      >
+        <div className="flex items-center gap-3 p-5 mb-2">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+            <ShieldAlert size={16} className="text-white" />
           </div>
-          <div className="font-bold text-white tracking-wide">ADMIN PANEL</div>
+          <div className="font-bold text-white tracking-wide text-sm">ADMIN PANEL</div>
         </div>
-        
-        <nav className="flex flex-col gap-1 px-4 flex-1">
-          <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-2 mb-2">Management</div>
+
+        <nav className="flex flex-col gap-0.5 px-3 flex-1">
+          <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-2 mb-2">
+            Management
+          </div>
           {adminNavItems.map((item) => {
             const Icon = item.icon;
-            // Simplified active check since we don't have usePathname in this Server Component
+            const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => setSidebarOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors hover:text-white hover:bg-white/10"
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-white/10 text-white"
+                    : "hover:text-white hover:bg-white/10"
                 )}
               >
-                <Icon size={18} />
+                <Icon size={16} />
                 {item.label}
               </Link>
             );
@@ -47,22 +74,31 @@ export default function AdminLayout({
         </nav>
       </aside>
 
-      {/* Admin Main Area */}
-      <main className="flex-1 h-full overflow-y-auto relative">
+      {/* Main Area */}
+      <main className="flex-1 h-full overflow-y-auto flex flex-col min-w-0">
         {/* Top Navbar */}
-        <header className="sticky top-0 bg-white border-b border-border h-16 flex items-center justify-between px-8 z-10">
-          <h2 className="font-bold text-lg">System Dashboard</h2>
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-end">
+        <header className="sticky top-0 bg-white border-b border-border h-14 flex items-center justify-between px-4 sm:px-6 z-20 shrink-0">
+          <div className="flex items-center gap-3">
+            {/* Mobile menu button */}
+            <button
+              className="lg:hidden p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+            <h2 className="font-bold text-sm sm:text-base text-foreground">System Dashboard</h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex flex-col items-end">
               <span className="text-sm font-bold leading-none">Super Admin</span>
               <span className="text-[10px] text-muted">admin@battlezone.com</span>
             </div>
-            <div className="h-8 w-8 rounded-full bg-gray-900 border-2 border-white shadow-sm"></div>
+            <div className="h-8 w-8 rounded-full bg-gray-900 border-2 border-white shadow-sm shrink-0" />
           </div>
         </header>
 
         {/* Content */}
-        <div className="p-8">
+        <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
           {children}
         </div>
       </main>
