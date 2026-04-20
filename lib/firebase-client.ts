@@ -7,13 +7,13 @@ import {
 } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAOwiC-UjjYXDZ3rymcSh0gN3bhsfmUiZo",
-  authDomain: "battlefire-arena.firebaseapp.com",
-  databaseURL: "https://battlefire-arena-default-rtdb.firebaseio.com",
-  projectId: "battlefire-arena",
-  storageBucket: "battlefire-arena.firebasestorage.app",
-  messagingSenderId: "571922400958",
-  appId: "1:571922400958:web:662de92861b7680251c0ef"
+  apiKey: "AIzaSyBvNrJ0ZqlR2QBhfRBcv2wPISaZjzNwUsg",
+  authDomain: "tournament-app-41636.firebaseapp.com",
+  databaseURL: "https://tournament-app-41636-default-rtdb.firebaseio.com",
+  projectId: "tournament-app-41636",
+  storageBucket: "tournament-app-41636.firebasestorage.app",
+  messagingSenderId: "262504693288",
+  appId: "1:262504693288:web:70883aa0ee6a3d13887f1d"
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
