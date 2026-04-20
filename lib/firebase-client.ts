@@ -1,6 +1,10 @@
-import { initializeApp, getApps } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { 
+  initializeFirestore, 
+  persistentLocalCache, 
+  persistentMultipleTabManager 
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAOwiC-UjjYXDZ3rymcSh0gN3bhsfmUiZo",
@@ -12,7 +16,13 @@ const firebaseConfig = {
   appId: "1:571922400958:web:662de92861b7680251c0ef"
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+
+// Initialize Firestore with Persistent Local Cache for Zero-Cost Scaling
+export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager()
+  })
+});
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);

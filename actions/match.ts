@@ -1,10 +1,12 @@
 "use server";
 
-import { adminDb, admin } from "@/lib/firebase-admin";
+import { getAdminDb, admin } from "@/lib/firebase-admin";
+import { sendTargetedPushNotification } from "@/lib/fcm-server";
 import { revalidatePath } from "next/cache";
 
 export async function joinMatch(matchId: string, userId: string, slot: number, ffName: string, ffUid: string) {
   try {
+    const adminDb = getAdminDb();
     const matchRef = adminDb.collection("tournaments").doc(matchId);
     const userRef = adminDb.collection("users").doc(userId);
 
@@ -104,5 +106,48 @@ export async function joinMatch(matchId: string, userId: string, slot: number, f
   } catch (error: any) {
     console.error("Join Match Error:", error);
     return { success: false, error: error.message || "Failed to join match" };
+  }
+}
+
+/**
+ * Trigger 3 (Match Updates): Staff updates Room ID/Password.
+ * Sends push notification ONLY to the users who joined this specific match.
+ */
+export async function updateMatchRoomDetails(matchId: string, roomId: string, roomPass: string) {
+  try {
+    const adminDb = getAdminDb();
+    const matchRef = adminDb.collection("tournaments").doc(matchId);
+    
+    // Using transaction to fetch participants then update room details
+    const result = await adminDb.runTransaction(async (transaction) => {
+      const matchDoc = await transaction.get(matchRef);
+      if (!matchDoc.exists) throw new Error("Match not found");
+      const matchData = matchDoc.data()!;
+
+      transaction.update(matchRef, {
+        roomId,
+        roomPass,
+        publishRoom: true, // Auto publish to players
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      return { success: true, matchName: matchData.name, participants: matchData.joinedUsers || [] };
+    });
+
+    // Send push notification safely outside transaction
+    if (result.success && result.participants.length > 0) {
+      const participantUids = result.participants.map((u: any) => u.userDocId);
+      await sendTargetedPushNotification(
+        participantUids, 
+        `Room Ready: ${result.matchName} 🎮`, 
+        `Room ID: ${roomId} | Pass: ${roomPass}. Good luck!`
+      );
+    }
+    
+    return { success: true };
+
+  } catch (error: any) {
+    console.error("Update Match Room Error:", error);
+    return { success: false, error: error.message };
   }
 }

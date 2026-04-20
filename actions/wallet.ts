@@ -2,7 +2,7 @@
 
 import Razorpay from "razorpay";
 import crypto from "crypto";
-import { adminDb, admin } from "@/lib/firebase-admin";
+import { getAdminDb, admin } from "@/lib/firebase-admin";
 import { revalidatePath } from "next/cache";
 
 const razorpay = new Razorpay({
@@ -47,6 +47,7 @@ export async function verifyPayment(
 
     if (isAuthentic) {
       // Atomic increment of user wallet using Admin SDK
+      const adminDb = getAdminDb();
       const userRef = adminDb.collection("users").doc(userId);
       
       await adminDb.runTransaction(async (transaction) => {
