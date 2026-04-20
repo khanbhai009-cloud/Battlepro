@@ -1,0 +1,108 @@
+/* [project]/app/globals.css [app-client] (css) */
+@theme {
+  --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+:root {
+  --background: #f8f9fa;
+  --foreground: #1a1a1a;
+  --card: #fff;
+  --card-foreground: #1a1a1a;
+  --primary: #2563eb;
+  --primary-foreground: #fff;
+  --muted: #6b7280;
+  --muted-foreground: #9ca3af;
+  --border: #e5e7eb;
+  --wallet-bg: #1a1a1a;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter);
+}
+
+.card-base {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: transform .1s;
+  box-shadow: 0 1px 3px #0000000d;
+}
+
+.wallet-card {
+  background: var(--wallet-bg);
+  color: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.wallet-card:after {
+  content: "";
+  background: #ffffff0d;
+  border-radius: 50%;
+  width: 6.25rem;
+  height: 6.25rem;
+  position: absolute;
+  top: -1.25rem;
+  right: -1.25rem;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: .5rem;
+  padding: .625rem 1rem;
+  font-size: .875rem;
+  font-weight: 600;
+  transition: all .2s;
+  display: inline-flex;
+}
+
+.btn-primary:active {
+  transform: scale(.98);
+}
+
+.status-chip {
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  border-radius: 9999px;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+}
+
+.chip-live {
+  color: #059669;
+  background: #ecfdf5;
+}
+
+.chip-upcoming {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%) 0 0 / 200% 100%;
+  animation: 1.5s infinite shimmer;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/*# sourceMappingURL=app_globals_css_0w3-wzy._.single.css.map*/
