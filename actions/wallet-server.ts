@@ -8,8 +8,16 @@ function revalidateAll() {
   revalidatePath("/", "layout");
 }
 
-export async function requestWithdrawal(userId: string, amount: number) {
+export async function requestWithdrawal(
+  userId: string,
+  amount: number,
+  method: "UPI" | "Bank" | "Wallet" = "UPI"
+) {
   try {
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new Error("Amount must be greater than 0");
+    }
+
     const adminDb = getAdminDb();
     const userRef = adminDb.collection("users").doc(userId);
 
@@ -30,6 +38,7 @@ export async function requestWithdrawal(userId: string, amount: number) {
       t.set(widRef, {
         userId,
         amount,
+        method,
         status: "Pending",
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
