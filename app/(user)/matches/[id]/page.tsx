@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { Trophy, Users, Clock, Lock, Map, Swords, Star } from "lucide-react";
 import { JoinMatchSection } from "./JoinMatchSection";
+import SafeImage from "@/components/SafeImage";
 
 async function getMatch(id: string) {
   try {
@@ -44,7 +45,7 @@ export default async function MatchDetailPage({ params }: { params: Promise<{ id
   return (
     <div className="space-y-5 max-w-2xl">
       {match.banner && (
-        <img src={match.banner} alt={match.name} className="w-full h-40 object-cover rounded-2xl" onError={(e: any) => (e.currentTarget.style.display = "none")} />
+        <SafeImage src={match.banner} alt={match.name} className="w-full h-40 object-cover rounded-2xl" />
       )}
 
       <div>

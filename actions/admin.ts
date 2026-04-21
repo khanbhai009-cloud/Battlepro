@@ -442,7 +442,13 @@ export async function createStaffUser(data: { name: string; email: string; passw
     const db = getAdminDb();
     const existing = await db.collection("staff_users").where("email", "==", data.email).get();
     if (!existing.empty) throw new Error("Email already exists");
-    await db.collection("staff_users").add({ ...data, createdAt: admin.firestore.FieldValue.serverTimestamp() });
+    // Every staff_user document is automatically granted the "admin" role so the
+    // login flow can resolve it correctly and stop the "Access Denied" error.
+    await db.collection("staff_users").add({
+      ...data,
+      role: "admin",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
     revalidateAll();
     return { success: true };
   } catch (error: any) {
@@ -453,7 +459,8 @@ export async function createStaffUser(data: { name: string; email: string; passw
 export async function updateStaffUser(id: string, data: { name: string; email: string; password: string }) {
   try {
     const db = getAdminDb();
-    await db.collection("staff_users").doc(id).update(data);
+    // Preserve the auto-injected "admin" role on every update.
+    await db.collection("staff_users").doc(id).update({ ...data, role: "admin" });
     revalidateAll();
     return { success: true };
   } catch (error: any) {

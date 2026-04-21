@@ -18,10 +18,28 @@ export async function createSession(idToken: string): Promise<{ success: boolean
     // 1. Verify the Firebase ID token server-side
     const decoded = await auth.verifyIdToken(idToken);
     const uid = decoded.uid;
+    const email = (decoded.email ?? "").toLowerCase();
 
     // 2. Fetch role from Firestore (default to "user" if doc doesn't exist yet)
     const userDoc = await db.collection("users").doc(uid).get();
-    const role: string = userDoc.exists ? (userDoc.data()?.role ?? "user") : "user";
+    let role: string = userDoc.exists ? (userDoc.data()?.role ?? "user") : "user";
+
+    // 2b. Fall back to the staff_users collection (admin-managed) when the
+    // users/{uid} doc doesn't carry an elevated role. This lets staff entries
+    // created by the admin panel resolve to "admin" / "staff" at login time.
+    if (role === "user" && email) {
+      const staffSnap = await db
+        .collection("staff_users")
+        .where("email", "==", email)
+        .limit(1)
+        .get();
+      if (!staffSnap.empty) {
+        const staffRole = staffSnap.docs[0].data()?.role;
+        if (staffRole === "admin" || staffRole === "staff") {
+          role = staffRole;
+        }
+      }
+    }
 
     // 3. Set secure HTTP-only cookies
     const cookieStore = await cookies();

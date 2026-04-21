@@ -5,6 +5,7 @@ import Link from "next/link";
 import { HomeBanners } from "./HomeBanners";
 import { HomeMatchTabs } from "./HomeMatchTabs";
 import SafeImage from "@/components/SafeImage";
+import MatchJoinCTA from "@/components/user/MatchJoinCTA";
 
 export const revalidate = 0;
 
@@ -42,7 +43,19 @@ export default async function HomePage() {
   const uid = cookieStore.get("session")?.value;
   if (!uid) redirect("/login");
 
-  const { matches, banners, games } = await getHomeData(uid);
+  const { user, matches, banners, games } = await getHomeData(uid);
+
+  // Tolerate multiple wallet schemas (wallets.{deposit,winning,bonus} | walletBalance | balance | wallet)
+  const u = (user ?? {}) as any;
+  const userBalance = Number(
+    (u?.wallets?.deposit ?? 0) +
+      (u?.wallets?.winning ?? 0) +
+      (u?.wallets?.bonus ?? 0) ||
+      u?.walletBalance ||
+      u?.balance ||
+      u?.wallet ||
+      0
+  );
 
   const myMatches = matches.filter((m) =>
     (m.joinedUsers ?? []).some((u: any) => u.userDocId === uid)
@@ -82,15 +95,19 @@ export default async function HomePage() {
               const max = match.max ?? 100;
               const pct = Math.min((joined / max) * 100, 100);
               const pool = match.pool ?? match.prize ?? 0;
+              const fee = Number(match.fee ?? 0);
               const statusKey = String(match.status ?? "").toLowerCase();
               const statusColors: Record<string, string> = {
                 upcoming: "bg-blue-100 text-blue-700",
                 ongoing: "bg-green-100 text-green-700",
                 live: "bg-red-100 text-red-700",
               };
+              const alreadyJoined = (match.joinedUsers ?? []).some(
+                (j: any) => j.userDocId === uid
+              );
               return (
-                <Link key={match.id} href={`/matches/${match.id}`}>
-                  <div className="card-base hover:border-primary/20 transition-all cursor-pointer">
+                <div key={match.id} className="card-base hover:border-primary/20 transition-all">
+                  <Link href={`/matches/${match.id}`} className="block">
                     {match.banner && (
                       <SafeImage
                         src={match.banner}
@@ -113,7 +130,7 @@ export default async function HomePage() {
                     <h3 className="font-bold text-sm mb-2 line-clamp-1">{match.name}</h3>
                     <div className="flex justify-between text-xs text-muted mb-2">
                       <span>Pool: <strong className="text-foreground">₹{pool}</strong></span>
-                      <span>Fee: <strong className="text-foreground">₹{match.fee ?? 0}</strong></span>
+                      <span>Fee: <strong className="text-foreground">₹{fee}</strong></span>
                       {match.perKill > 0 && (
                         <span>Kill: <strong className="text-green-600">₹{match.perKill}</strong></span>
                       )}
@@ -124,8 +141,16 @@ export default async function HomePage() {
                     <div className="text-[10px] text-muted mt-1.5 font-medium">
                       {joined}/{max} joined
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                  <MatchJoinCTA
+                    matchId={match.id}
+                    status={match.status}
+                    fee={fee}
+                    userBalance={userBalance}
+                    alreadyJoined={alreadyJoined}
+                    isFull={joined >= max}
+                  />
+                </div>
               );
             })}
           </div>

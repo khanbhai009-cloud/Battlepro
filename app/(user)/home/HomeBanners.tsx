@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import SafeImage from "@/components/SafeImage";
 
 export function HomeBanners({ banners }: { banners: { id: string; url: string; link?: string }[] }) {
   const [current, setCurrent] = useState(0);
@@ -29,20 +30,10 @@ export function HomeBanners({ banners }: { banners: { id: string; url: string; l
       >
         {b.link ? (
           <a href={b.link} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-            <img
-              src={b.url}
-              alt="banner"
-              className="w-full h-full object-cover"
-              onError={(e) => (e.currentTarget.style.display = "none")}
-            />
+            <SafeImage src={b.url} alt="banner" className="w-full h-full object-cover" />
           </a>
         ) : (
-          <img
-            src={b.url}
-            alt="banner"
-            className="w-full h-full object-cover"
-            onError={(e) => (e.currentTarget.style.display = "none")}
-          />
+          <SafeImage src={b.url} alt="banner" className="w-full h-full object-cover" />
         )}
       </div>
 
