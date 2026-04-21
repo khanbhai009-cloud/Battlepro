@@ -44,18 +44,26 @@ jobs:
 
       - name: Copy ${{ matrix.variant.name }} Configuration
         run: |
-          echo "Copying ${{ matrix.variant.config }} to capacitor.config.json"
           cp ${{ matrix.variant.config }} capacitor.config.json
           cat capacitor.config.json
 
       - name: Sync Capacitor for ${{ matrix.variant.name }}
         run: npx cap sync android
 
-      - name: Fix gradlew after Sync
+      - name: Fix gradlew (Nuclear Mode)
         run: |
-          sed -i 's/\r$//' android/gradlew
+          # Python se guaranteed CRLF fix
+          python3 -c "
+          content = open('android/gradlew', 'rb').read()
+          fixed = content.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
+          open('android/gradlew', 'wb').write(fixed)
+          print('CRLF bytes fixed:', content.count(b'\r'))
+          "
           chmod +x android/gradlew
-          echo "gradlew fixed ✅"
+          
+          # Verify karo - agar ^M nahi dikh raha toh fix successful
+          echo "=== First 5 lines check (no ^M = good) ==="
+          cat -A android/gradlew | head -5
 
       - name: Build ${{ matrix.variant.name }} APK
         run: |
@@ -71,7 +79,6 @@ jobs:
           fi
           
           echo "Build completed successfully"
-          
           find android/app/build/outputs/apk -name "*.apk" | head -1 | xargs -I {} cp {} ${{ matrix.variant.output }}
           ls -lh ${{ matrix.variant.output }} || echo "ERROR: APK not found"
 
