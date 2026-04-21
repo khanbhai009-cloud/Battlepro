@@ -7,24 +7,39 @@ import { LogOut, Gift, Star } from "lucide-react";
 import ProfileSection from "@/components/ProfileSection";
 
 async function getUserData(uid: string) {
+  const db = getAdminDb();
+
+  let userData: any = {};
   try {
-    const db = getAdminDb();
-    const [userDoc, txnSnap] = await Promise.all([
-      db.collection("users").doc(uid).get(),
-      db.collection("transactions").where("userId", "==", uid).orderBy("createdAt", "desc").limit(10).get(),
-    ]);
-
+    const userDoc = await db.collection("users").doc(uid).get();
     if (!userDoc.exists) return null;
-
-    // JSON round-trip strips Firestore Timestamps so it's safe to pass to Client Components.
-    const transactions = JSON.parse(
-      JSON.stringify(txnSnap.docs.map((d) => ({ id: d.id, ...d.data() })))
-    ) as any[];
-    const userData = JSON.parse(JSON.stringify(userDoc.data() ?? {})) as any;
-    return { uid, ...userData, transactions } as any;
-  } catch {
+    userData = JSON.parse(JSON.stringify(userDoc.data() ?? {}));
+  } catch (err) {
+    console.error("Profile user fetch error:", err);
     return null;
   }
+
+  // Transactions are fetched separately and sorted in-memory so a missing
+  // composite index never wipes out the entire profile page.
+  let transactions: any[] = [];
+  try {
+    const txnSnap = await db
+      .collection("transactions")
+      .where("userId", "==", uid)
+      .limit(50)
+      .get();
+    transactions = txnSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+    transactions.sort((a, b) => {
+      const av = a.createdAt?._seconds ?? a.createdAt?.seconds ?? 0;
+      const bv = b.createdAt?._seconds ?? b.createdAt?.seconds ?? 0;
+      return bv - av;
+    });
+    transactions = JSON.parse(JSON.stringify(transactions.slice(0, 10)));
+  } catch (err) {
+    console.error("Profile transactions fetch error:", err);
+  }
+
+  return { uid, ...userData, transactions } as any;
 }
 
 export default async function ProfilePage() {
@@ -50,7 +65,7 @@ export default async function ProfilePage() {
         </div>
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-foreground truncate flex items-center gap-2">
-            {user?.ffName ?? "Mysterious Warrior"}
+            {user?.ffName ?? "Player"}
           </h1>
           <p className="text-sm text-muted truncate">{user?.email ?? uid}</p>
           <div className="flex items-center gap-2 mt-2 flex-wrap">

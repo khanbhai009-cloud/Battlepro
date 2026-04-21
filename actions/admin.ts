@@ -45,8 +45,14 @@ export async function getAdminStats() {
 export async function getPendingWithdrawals() {
   try {
     const db = getAdminDb();
-    const snap = await db.collection("withdrawals").where("status", "==", "Pending").orderBy("createdAt", "desc").limit(50).get();
+    // Avoid composite index — filter by status only, sort in memory.
+    const snap = await db.collection("withdrawals").where("status", "==", "Pending").limit(50).get();
     const withdrawals = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+    withdrawals.sort((a, b) => {
+      const av = a.createdAt?._seconds ?? a.createdAt?.seconds ?? 0;
+      const bv = b.createdAt?._seconds ?? b.createdAt?.seconds ?? 0;
+      return bv - av;
+    });
 
     const withUserData = await Promise.all(
       withdrawals.map(async (w) => {
@@ -55,7 +61,8 @@ export async function getPendingWithdrawals() {
       })
     );
     return JSON.parse(JSON.stringify(withUserData));
-  } catch {
+  } catch (err) {
+    console.error("getPendingWithdrawals error:", err);
     return [];
   }
 }
@@ -265,12 +272,17 @@ export async function deleteTournament(tournamentId: string) {
 export async function getLiveMatches() {
   try {
     const db = getAdminDb();
-    const snap = await db.collection("tournaments")
-      .where("status", "in", ["live", "upcoming", "Upcoming", "Ongoing"])
-      .orderBy("createdAt", "desc")
-      .get();
-    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
-  } catch {
+    // Avoid composite-index requirement: fetch recent tournaments and filter
+    // in memory (case-insensitively). This is what was causing the staff panel
+    // to silently return [].
+    const snap = await db.collection("tournaments").orderBy("createdAt", "desc").limit(200).get();
+    const allowed = new Set(["live", "upcoming", "ongoing"]);
+    const filtered = snap.docs
+      .map((d) => ({ id: d.id, ...d.data() }) as any)
+      .filter((m) => allowed.has(String(m.status ?? "").toLowerCase()));
+    return JSON.parse(JSON.stringify(filtered));
+  } catch (err) {
+    console.error("getLiveMatches error:", err);
     return [];
   }
 }
@@ -529,9 +541,17 @@ export async function searchUserTransactions(userIdOrEmail: string) {
       const usersSnap = await db.collection("users").where("email", "==", uid).limit(1).get();
       if (!usersSnap.empty) uid = usersSnap.docs[0].id;
     }
-    const snap = await db.collection("transactions").where("userId", "==", uid).orderBy("createdAt", "desc").limit(50).get();
-    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
-  } catch {
+    // Avoid composite index — filter by userId only, sort in memory.
+    const snap = await db.collection("transactions").where("userId", "==", uid).limit(100).get();
+    const items = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+    items.sort((a, b) => {
+      const av = a.createdAt?._seconds ?? a.createdAt?.seconds ?? 0;
+      const bv = b.createdAt?._seconds ?? b.createdAt?.seconds ?? 0;
+      return bv - av;
+    });
+    return JSON.parse(JSON.stringify(items.slice(0, 50)));
+  } catch (err) {
+    console.error("searchUserTransactions error:", err);
     return [];
   }
 }

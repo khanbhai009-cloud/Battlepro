@@ -74,7 +74,7 @@ export default function RegisterPage() {
           <div className="text-2xl font-extrabold tracking-tighter text-foreground mb-1">
             BATTLEZONE <span className="text-primary">PRO</span>
           </div>
-          <p className="text-sm text-muted font-medium italic">Join the Elite Warriors</p>
+          <p className="text-sm text-muted font-bold">Create your account</p>
         </div>
 
         {/* Card */}
@@ -159,7 +159,7 @@ export default function RegisterPage() {
                   Creating Account…
                 </>
               ) : (
-                "Join the Battlefield"
+                "Sign Up"
               )}
             </Button>
           </form>

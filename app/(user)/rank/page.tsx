@@ -25,8 +25,8 @@ export default async function RankPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Hall of Fame</h1>
-        <p className="text-muted text-sm font-medium">The elite warriors of BattleZone Pro.</p>
+        <h1 className="text-3xl font-bold tracking-tight mb-2">Leaderboard</h1>
+        <p className="text-muted text-sm font-medium">Top players ranked by current month winnings.</p>
       </div>
 
       <div className="space-y-3">
@@ -43,7 +43,7 @@ export default async function RankPage() {
                  player.rank}
               </div>
               <div>
-                <div className="font-bold text-foreground">{player.ffName || "Mysterious Warrior"}</div>
+                <div className="font-bold text-foreground">{player.ffName || "Player"}</div>
                 <div className="text-[10px] font-bold text-muted uppercase tracking-widest flex items-center gap-1">
                   <Star size={8} className="fill-primary text-primary" />
                   LEVEL {Math.floor((player.totalMatches || 0) / 10) + 1}
@@ -52,10 +52,10 @@ export default async function RankPage() {
             </div>
             
             <div className="text-right">
-              <div className="text-sm font-black text-primary italic">
+              <div className="text-sm font-black text-primary">
                 {formatCurrency(player.wallets?.winning || 0)}
               </div>
-              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">Total Winnings</div>
+              <div className="text-[10px] font-bold text-muted uppercase tracking-tighter">Total Winnings</div>
             </div>
           </div>
         ))}
@@ -63,7 +63,7 @@ export default async function RankPage() {
         {players.length === 0 && (
           <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-border mt-10">
             <Trophy size={48} className="mx-auto text-gray-200 mb-4" />
-            <p className="text-muted text-sm font-medium">No champions yet. Will you be the first?</p>
+            <p className="text-muted text-sm font-medium">No players ranked yet.</p>
           </div>
         )}
       </div>

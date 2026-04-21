@@ -72,11 +72,22 @@ export function StaffMatchesClient({ matches }: { matches: Match[] }) {
               onClick={() => setExpanded(isExpanded ? null : match.id)}
             >
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${match.status === "live" ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"}`}>
-                    {match.status === "live" ? "● Live" : "Upcoming"}
+                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                  {(() => {
+                    const s = String(match.status ?? "").toLowerCase();
+                    const cls =
+                      s === "live" || s === "ongoing"
+                        ? "bg-red-100 text-red-600"
+                        : "bg-blue-100 text-blue-600";
+                    return (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${cls}`}>
+                        {match.status}
+                      </span>
+                    );
+                  })()}
+                  <span className="text-xs text-muted font-medium">
+                    {(match as any).category ?? match.game} · {(match as any).type ?? match.mode}
                   </span>
-                  <span className="text-xs text-muted font-medium">{match.game} · {match.mode}</span>
                 </div>
                 <h3 className="font-bold text-foreground">{match.name}</h3>
                 <div className="flex items-center gap-4 mt-1 text-xs text-muted font-medium">

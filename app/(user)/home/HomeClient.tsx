@@ -60,9 +60,7 @@ export default function HomeClient({
 
       {/* My Matches */}
       <div>
-        <h2 className="text-base font-bold text-foreground mb-3 flex items-center gap-2">
-          <span>🎮</span> My Matches
-        </h2>
+        <h2 className="text-base font-bold text-foreground mb-3">My Matches</h2>
         <HomeMatchTabs matches={myMatches} userId={userId} />
       </div>
 
@@ -70,11 +68,9 @@ export default function HomeClient({
       {liveMatches.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-foreground flex items-center gap-2">
-              <span>🔥</span> Live &amp; Upcoming
-            </h2>
+            <h2 className="text-base font-bold text-foreground">Live &amp; Upcoming</h2>
             <Link href="/matches" className="text-primary text-xs font-bold hover:underline">
-              View All →
+              View All
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -155,9 +151,7 @@ export default function HomeClient({
       {/* Esports Categories */}
       {initialGames.length > 0 && (
         <div>
-          <h2 className="text-base font-bold text-foreground mb-3 flex items-center gap-2">
-            <span>🕹️</span> Esports Categories
-          </h2>
+          <h2 className="text-base font-bold text-foreground mb-3">Esports Categories</h2>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
             {initialGames.map((game: any) => (
               <Link key={game.id} href={`/matches?category=${encodeURIComponent(game.name)}`}>
@@ -169,8 +163,8 @@ export default function HomeClient({
                       className="w-10 h-10 object-contain"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-lg">
-                      🎮
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-xs font-black text-primary">
+                      {(game.name ?? "?").slice(0, 2).toUpperCase()}
                     </div>
                   )}
                   <span className="text-[11px] font-bold text-foreground text-center line-clamp-1">

@@ -63,7 +63,7 @@ export default function LoginPage() {
           <div className="text-2xl font-extrabold tracking-tighter text-foreground mb-1">
             BATTLEZONE <span className="text-primary">PRO</span>
           </div>
-          <p className="text-sm text-muted font-medium italic">Elite Esports Experience</p>
+          <p className="text-sm text-muted font-bold">Sign in to your account</p>
         </div>
 
         {/* Card */}
@@ -114,7 +114,7 @@ export default function LoginPage() {
                   Logging in…
                 </>
               ) : (
-                "Login to Battlefield"
+                "Sign In"
               )}
             </Button>
           </form>
@@ -122,26 +122,9 @@ export default function LoginPage() {
           <p className="text-center text-xs text-muted font-medium mt-6">
             Don&apos;t have an account?{" "}
             <Link href="/register" className="text-primary font-bold hover:underline">
-              Join the Elite
+              Sign Up
             </Link>
           </p>
-        </div>
-
-        {/* Staff / Admin Links */}
-        <div className="flex justify-center items-center gap-6">
-          <Link
-            href="/staff/login"
-            className="text-[11px] font-bold uppercase tracking-widest text-muted hover:text-foreground transition-colors"
-          >
-            Staff Access
-          </Link>
-          <span className="text-border select-none text-xs">|</span>
-          <Link
-            href="/admin/login"
-            className="text-[11px] font-bold uppercase tracking-widest text-muted hover:text-foreground transition-colors"
-          >
-            Admin Terminal
-          </Link>
         </div>
 
       </div>

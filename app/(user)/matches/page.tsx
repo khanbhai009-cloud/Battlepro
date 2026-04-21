@@ -167,9 +167,9 @@ export default async function MatchesPage({
 
   const tabs = [
     { key: "all", label: "All" },
-    { key: "live", label: "🟢 Ongoing" },
-    { key: "upcoming", label: "📅 Upcoming" },
-    { key: "ended", label: "🏆 Results" },
+    { key: "live", label: "Ongoing" },
+    { key: "upcoming", label: "Upcoming" },
+    { key: "ended", label: "Results" },
   ];
 
   return (
