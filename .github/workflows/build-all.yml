@@ -1,0 +1,64 @@
+name: Build 3 APKs
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: gradle
+
+      - name: Install Dependencies
+        run: |
+          npm install
+          chmod +x android/gradlew
+
+      - name: Build User APK
+        run: |
+          cp cap.user.json capacitor.config.json
+          cp assets/user.jpg assets/icon.png  # Recommended: Use .png if possible
+          npx capacitor-assets generate --android
+          npx cap sync android
+          cd android && ./gradlew assembleRelease
+          mv app/build/outputs/apk/release/app-release-unsigned.apk ../BattlePro-User.apk
+
+      - name: Build Staff APK
+        run: |
+          cd .. # Go back to root
+          cp cap.staff.json capacitor.config.json
+          cp assets/staff.png assets/icon.png
+          npx capacitor-assets generate --android
+          npx cap sync android
+          cd android && ./gradlew assembleRelease
+          mv app/build/outputs/apk/release/app-release-unsigned.apk ../BattlePro-Staff.apk
+
+      - name: Build Admin APK
+        run: |
+          cd .. # Go back to root
+          cp cap.admin.json capacitor.config.json
+          cp assets/admin.png assets/icon.png
+          npx capacitor-assets generate --android
+          npx cap sync android
+          cd android && ./gradlew assembleRelease
+          mv app/build/outputs/apk/release/app-release-unsigned.apk ../BattlePro-Admin.apk
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v3
+        with:
+          name: BattlePro-APKs
+          path: ./*.apk
+          
