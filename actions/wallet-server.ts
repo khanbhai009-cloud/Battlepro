@@ -53,12 +53,16 @@ export async function requestWithdrawal(
         status: "Pending",
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
-
-      sendAdminPushNotification(
-        "New Withdrawal Request 💰",
-        `₹${amount} withdrawal requested by ${ffName}`
-      );
     });
+
+    // Notify admins AFTER the transaction commits, awaited so logs surface and
+    // the in-app notification doc is written before we return.
+    const userSnap = await adminDb.collection("users").doc(userId).get();
+    const ffName = userSnap.data()?.ffName || "Player";
+    await sendAdminPushNotification(
+      "New Withdrawal Request 💰",
+      `₹${amount} ${method} withdrawal requested by ${ffName}`
+    );
 
     // Purge cache — admin withdrawal queue and user wallet must update together
     revalidateAll();
