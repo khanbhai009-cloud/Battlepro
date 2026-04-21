@@ -55,6 +55,34 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
+      - name: Generate App Icon
+        run: |
+          # Tool install karna
+          npm install @capacitor/assets --no-save
+          
+          # Temporary resources folder banana
+          mkdir -p resources
+          
+          # assets/ folder se image uthana (png ya jpg)
+          if [ -f "assets/${{ matrix.variant.name }}.png" ]; then
+            echo "Found PNG for ${{ matrix.variant.name }}"
+            cp "assets/${{ matrix.variant.name }}.png" resources/icon-only.png
+            cp "assets/${{ matrix.variant.name }}.png" resources/icon-foreground.png
+            cp "assets/${{ matrix.variant.name }}.png" resources/icon.png
+          elif [ -f "assets/${{ matrix.variant.name }}.jpg" ]; then
+            echo "Found JPG for ${{ matrix.variant.name }}"
+            cp "assets/${{ matrix.variant.name }}.jpg" resources/icon-only.png
+            cp "assets/${{ matrix.variant.name }}.jpg" resources/icon-foreground.png
+            cp "assets/${{ matrix.variant.name }}.jpg" resources/icon.png
+          fi
+          
+          # Icon generate karna (Splash screen skip kar rahe hain time bachane ke liye)
+          if [ -d "resources" ]; then
+            npx @capacitor/assets generate --android --icon --assetPath resources
+          else
+            echo "⚠️ Warning: Icon file nahi mili, default icon hi rahega."
+          fi
+
       - name: Fix gradlew
         run: |
           python3 -c "
@@ -77,27 +105,11 @@ jobs:
 
       - name: Generate Google Services JSON (From GitHub Secrets)
         env:
-          # Yahan hum explicitly GitHub secret ko environment variable me daal rahe hain
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          echo "Fetching data from GitHub Secrets..."
           mkdir -p android/app
-          
-          # Secret ko file me likhna
           echo "$GOOGLE_SERVICES" > android/app/google-services.json
-          
-          echo "=== File Status ==="
-          ls -lh android/app/google-services.json
-          
-          echo "=== Validation Check ==="
-          if [ ! -s android/app/google-services.json ] || [ $(wc -c < android/app/google-services.json) -le 5 ]; then 
-            echo "❌ ERROR: File is empty! GitHub Secrets me GOOGLE_SERVICES_JSON nahi mila ya blank hai."
-            exit 1
-          else
-            echo "✅ Data successfully fetched from GitHub Secrets."
-          fi
-          
-          python3 -c "import json; json.load(open('android/app/google-services.json')); print('✅ JSON Format Valid Hai!')"
+          python3 -c "import json; json.load(open('android/app/google-services.json')); print('✅ JSON Format Valid!')"
 
       - name: Build ${{ matrix.variant.name }} APK
         timeout-minutes: 25
