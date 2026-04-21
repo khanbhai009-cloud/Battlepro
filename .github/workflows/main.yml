@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20' # Isko 18 se 20 kar diya taaki Firebase error na de
           cache: 'npm'
 
       - name: Set up JDK 17
@@ -76,9 +76,9 @@ jobs:
             cp "assets/${{ matrix.variant.name }}.jpg" resources/icon.png
           fi
           
-          # Icon generate karna (Splash screen skip kar rahe hain time bachane ke liye)
+          # Command fix ki hai (--icon hata diya hai kyunki ye option tool me nahi hai)
           if [ -d "resources" ]; then
-            npx @capacitor/assets generate --android --icon --assetPath resources
+            npx @capacitor/assets generate --android --assetPath resources
           else
             echo "⚠️ Warning: Icon file nahi mili, default icon hi rahega."
           fi
