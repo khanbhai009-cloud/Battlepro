@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, Trophy, Image, Gift, Users, Bell, MessageSquare, Globe, ClipboardList, BarChart3, Menu, X, Swords } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { destroyStaffSession } from "@/actions/staff-session";
 
 const staffNavItems = [
   { label: "Dashboard", href: "/staff/dashboard", icon: LayoutDashboard },
@@ -18,15 +19,6 @@ const staffNavItems = [
   { label: "Transactions", href: "/staff/transactions", icon: ClipboardList },
   { label: "Leaderboard", href: "/staff/leaderboard", icon: BarChart3 },
 ];
-
-async function staffLogout() {
-  "use server";
-  const { cookies } = await import("next/headers");
-  const { redirect } = await import("next/navigation");
-  const cookieStore = await cookies();
-  cookieStore.delete("staff_session");
-  redirect("/staff/login");
-}
 
 export default function StaffPanelLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -71,9 +63,11 @@ export default function StaffPanelLayout({ children }: { children: React.ReactNo
         </nav>
 
         <div className="px-2 pb-4 border-t border-white/10 pt-2">
-          <a href="/staff/login" onClick={async () => { await fetch("/api/staff-logout"); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-red-400 hover:bg-red-900/30 transition-colors">
-            Logout
-          </a>
+          <form action={destroyStaffSession}>
+            <button type="submit" className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-red-400 hover:bg-red-900/30 transition-colors">
+              Logout
+            </button>
+          </form>
         </div>
       </aside>
 
