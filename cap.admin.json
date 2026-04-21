@@ -1,0 +1,6 @@
+{
+  "appId": "com.battlepro.admin",
+  "appName": "BattlePro Admin",
+  "webDir": "dist",
+  "server": { "url": "https://battlepro.vercel.app/admin/dashboard", "cleartext": true }
+}
