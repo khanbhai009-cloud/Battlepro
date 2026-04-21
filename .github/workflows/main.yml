@@ -75,14 +75,29 @@ jobs:
           android.enableJetifier=true
           EOF
 
-      - name: Generate Google Services JSON
+      - name: Generate Google Services JSON (From GitHub Secrets)
         env:
+          # Yahan hum explicitly GitHub secret ko environment variable me daal rahe hain
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
+          echo "Fetching data from GitHub Secrets..."
           mkdir -p android/app
+          
+          # Secret ko file me likhna
           echo "$GOOGLE_SERVICES" > android/app/google-services.json
-          echo "=== Verify JSON valid hai ==="
-          python3 -c "import json; json.load(open('android/app/google-services.json')); print('✅ JSON valid!')"
+          
+          echo "=== File Status ==="
+          ls -lh android/app/google-services.json
+          
+          echo "=== Validation Check ==="
+          if [ ! -s android/app/google-services.json ] || [ $(wc -c < android/app/google-services.json) -le 5 ]; then 
+            echo "❌ ERROR: File is empty! GitHub Secrets me GOOGLE_SERVICES_JSON nahi mila ya blank hai."
+            exit 1
+          else
+            echo "✅ Data successfully fetched from GitHub Secrets."
+          fi
+          
+          python3 -c "import json; json.load(open('android/app/google-services.json')); print('✅ JSON Format Valid Hai!')"
 
       - name: Build ${{ matrix.variant.name }} APK
         timeout-minutes: 25
@@ -97,7 +112,6 @@ jobs:
           APK=$(find app/build/outputs/apk -name "*.apk" | head -1)
           echo "APK found: $APK"
           cp "$APK" ../${{ matrix.variant.output }}
-          ls -lh ../${{ matrix.variant.output }}
 
       - name: Upload ${{ matrix.variant.name }} APK
         uses: actions/upload-artifact@v4
