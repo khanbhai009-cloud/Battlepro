@@ -13,4 +13,4 @@
 
 # Preserve execute permissions for shell scripts
 android/gradlew text eol=lf
-gradlew text eol=lf
+android/**/*.sh text eol=lf
