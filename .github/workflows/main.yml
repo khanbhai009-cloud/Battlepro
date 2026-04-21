@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     strategy:
       matrix:
@@ -33,6 +34,9 @@ jobs:
           distribution: 'zulu'
           cache: 'gradle'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
@@ -50,9 +54,8 @@ jobs:
       - name: Sync Capacitor for ${{ matrix.variant.name }}
         run: npx cap sync android
 
-      - name: Fix gradlew (Nuclear Mode)
+      - name: Fix gradlew
         run: |
-          # Python se guaranteed CRLF fix
           python3 -c "
           content = open('android/gradlew', 'rb').read()
           fixed = content.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
@@ -60,25 +63,38 @@ jobs:
           print('CRLF bytes fixed:', content.count(b'\r'))
           "
           chmod +x android/gradlew
-          
-          # Verify karo - agar ^M nahi dikh raha toh fix successful
-          echo "=== First 5 lines check (no ^M = good) ==="
-          cat -A android/gradlew | head -5
+
+      - name: Setup Gradle Properties
+        run: |
+          mkdir -p android
+          cat > android/gradle.properties << EOF
+          org.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=512m
+          org.gradle.daemon=false
+          org.gradle.parallel=false
+          org.gradle.caching=false
+          android.useAndroidX=true
+          android.enableJetifier=true
+          EOF
 
       - name: Build ${{ matrix.variant.name }} APK
+        timeout-minutes: 20
         run: |
           cd android
           echo "Starting Gradle build for ${{ matrix.variant.name }}..."
-          ./gradlew assembleDebug --no-daemon --stacktrace
-          BUILD_EXIT=$?
+          ./gradlew assembleDebug \
+            --no-daemon \
+            --no-parallel \
+            --max-workers=2 \
+            --stacktrace \
+            --info 2>&1 | tail -100
+          BUILD_EXIT=${PIPESTATUS[0]}
           cd ..
           
           if [ $BUILD_EXIT -ne 0 ]; then
-            echo "Build failed with exit code: $BUILD_EXIT"
+            echo "Build failed: $BUILD_EXIT"
             exit 1
           fi
           
-          echo "Build completed successfully"
           find android/app/build/outputs/apk -name "*.apk" | head -1 | xargs -I {} cp {} ${{ matrix.variant.output }}
           ls -lh ${{ matrix.variant.output }} || echo "ERROR: APK not found"
 
