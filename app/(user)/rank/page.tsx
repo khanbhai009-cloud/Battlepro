@@ -2,6 +2,7 @@ import { getAdminDb } from "@/lib/firebase-admin";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Trophy, Medal, Star } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 export const revalidate = 0;
 

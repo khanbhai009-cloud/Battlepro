@@ -7,13 +7,13 @@ import { revalidatePath } from "next/cache";
 export async function getAdminStats() {
   try {
     const db = getAdminDb();
-    const [usersSnap, tournamentsSnap, withdrawalsSnap, staffSnap, txnSnap, vipSnap] = await Promise.all([
+    const [usersSnap, tournamentsSnap, liveSnap, withdrawalsSnap, staffSnap, txnSnap] = await Promise.all([
       db.collection("users").get(),
       db.collection("tournaments").get(),
+      db.collection("tournaments").where("status", "in", ["live", "Ongoing", "upcoming", "Upcoming"]).count().get(),
       db.collection("withdrawals").where("status", "==", "Pending").count().get(),
       db.collection("staff_users").get(),
       db.collection("transactions").where("type", "==", "Deposit").where("status", "==", "Success").get(),
-      db.collection("users").get(),
     ]);
 
     const totalRevenue = txnSnap.docs.reduce((sum, d) => sum + (d.data().amount ?? 0), 0);
@@ -26,13 +26,14 @@ export async function getAdminStats() {
     return {
       totalPlayers: usersSnap.size,
       totalMatches: tournamentsSnap.size,
+      liveMatches: liveSnap.data().count,
       pendingWithdrawals: withdrawalsSnap.data().count,
       totalRevenue,
       totalStaff: staffSnap.size,
       totalVip: vipCount,
     };
   } catch {
-    return { totalPlayers: 0, totalMatches: 0, pendingWithdrawals: 0, totalRevenue: 0, totalStaff: 0, totalVip: 0 };
+    return { totalPlayers: 0, totalMatches: 0, liveMatches: 0, pendingWithdrawals: 0, totalRevenue: 0, totalStaff: 0, totalVip: 0 };
   }
 }
 
