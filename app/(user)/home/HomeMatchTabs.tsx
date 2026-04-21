@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import SafeImage from "@/components/SafeImage";
 
 const tabs = ["Upcoming", "Ongoing", "Results"];
 const statusMap: Record<string, string[]> = {
@@ -62,11 +63,10 @@ export function HomeMatchTabs({ matches, userId }: { matches: any[]; userId: str
             <Link key={match.id} href={`/matches/${match.id}`}>
               <div className="card-base hover:border-primary/20 transition-all cursor-pointer flex items-center gap-3">
                 {match.banner && (
-                  <img
+                  <SafeImage
                     src={match.banner}
-                    alt=""
+                    alt={match.name ?? ""}
                     className="w-14 h-14 rounded-xl object-cover shrink-0"
-                    onError={(e) => (e.currentTarget.style.display = "none")}
                   />
                 )}
                 <div className="flex-1 min-w-0">
