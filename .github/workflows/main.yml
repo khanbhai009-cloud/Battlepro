@@ -33,14 +33,6 @@ jobs:
           distribution: 'zulu'
           cache: 'gradle'
 
-      - name: Fix Line Endings (CRLF to LF)
-        run: |
-          find android -name "gradlew" -type f -exec sed -i 's/\r$//' {} \;
-          find android -name "*.sh" -type f -exec sed -i 's/\r$//' {} \;
-          chmod +x android/gradlew
-          chmod -R +x android/gradle/wrapper
-          echo "Line endings fixed"
-
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
@@ -59,6 +51,12 @@ jobs:
       - name: Sync Capacitor for ${{ matrix.variant.name }}
         run: npx cap sync android
 
+      - name: Fix gradlew after Sync
+        run: |
+          sed -i 's/\r$//' android/gradlew
+          chmod +x android/gradlew
+          echo "gradlew fixed ✅"
+
       - name: Build ${{ matrix.variant.name }} APK
         run: |
           cd android
@@ -74,13 +72,12 @@ jobs:
           
           echo "Build completed successfully"
           
-          # Find and copy APK
           find android/app/build/outputs/apk -name "*.apk" | head -1 | xargs -I {} cp {} ${{ matrix.variant.output }}
           ls -lh ${{ matrix.variant.output }} || echo "ERROR: APK not found"
 
       - name: Upload ${{ matrix.variant.name }} APK
         uses: actions/upload-artifact@v4
         with:
-          name: BattlePro-APKs
-          path: BattlePro-*.apk
+          name: BattlePro-${{ matrix.variant.name }}-APK
+          path: ${{ matrix.variant.output }}
           retention-days: 7
