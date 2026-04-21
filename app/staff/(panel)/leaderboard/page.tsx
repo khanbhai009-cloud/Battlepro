@@ -31,7 +31,7 @@ export default async function StaffLeaderboardPage() {
                   <div className="font-bold">{p.ffName ?? "Player"}</div>
                   <div className="text-xs text-muted">{p.email}</div>
                 </td>
-                <td className="px-4 py-3 text-right font-black text-green-600">₹{p.currentMonthWinnings ?? 0}</td>
+                <td className="px-4 py-3 text-right font-black text-green-600">🪙{p.currentMonthWinnings ?? 0}</td>
               </tr>
             ))}
           </tbody>

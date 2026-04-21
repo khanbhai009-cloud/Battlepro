@@ -113,14 +113,14 @@ export default function HomeClient({
                   <h3 className="font-bold text-sm mb-2 line-clamp-1">{match.name}</h3>
                   <div className="flex justify-between text-xs text-muted mb-2">
                     <span>
-                      Pool: <strong className="text-foreground">₹{pool}</strong>
+                      Pool: <strong className="text-foreground">🪙{pool}</strong>
                     </span>
                     <span>
-                      Fee: <strong className="text-foreground">₹{fee}</strong>
+                      Fee: <strong className="text-foreground">🪙{fee}</strong>
                     </span>
                     {match.perKill > 0 && (
                       <span>
-                        Kill: <strong className="text-green-600">₹{match.perKill}</strong>
+                        Kill: <strong className="text-green-600">🪙{match.perKill}</strong>
                       </span>
                     )}
                   </div>

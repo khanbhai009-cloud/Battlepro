@@ -61,7 +61,7 @@ export async function requestWithdrawal(
     const ffName = userSnap.data()?.ffName || "Player";
     await sendAdminPushNotification(
       "New Withdrawal Request 💰",
-      `₹${amount} ${method} withdrawal requested by ${ffName}`
+      `🪙${amount} ${method} withdrawal requested by ${ffName}`
     );
 
     // Purge cache — admin withdrawal queue and user wallet must update together

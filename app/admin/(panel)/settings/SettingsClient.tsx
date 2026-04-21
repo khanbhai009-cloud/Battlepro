@@ -70,7 +70,7 @@ export function SettingsClient({ codes }: { codes: RedeemCode[] }) {
             <input type="text" className="auth-input uppercase" placeholder="e.g. WELCOME50" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Bonus Amount (₹) *</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Bonus Amount (🪙) *</label>
             <input type="number" className="auth-input" placeholder="e.g. 50" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
           </div>
           <div className="space-y-1.5">

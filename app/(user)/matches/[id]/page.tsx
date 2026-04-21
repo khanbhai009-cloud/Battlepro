@@ -59,9 +59,9 @@ export default async function MatchDetailPage({ params }: { params: Promise<{ id
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Prize Pool", value: `₹${pool}`, icon: Trophy, color: "text-amber-500" },
-          { label: "Entry Fee", value: `₹${match.fee ?? 0}`, icon: Clock, color: "text-primary" },
-          { label: "Per Kill", value: match.perKill > 0 ? `₹${match.perKill}` : "—", icon: Star, color: "text-green-600" },
+          { label: "Prize Pool", value: `🪙${pool}`, icon: Trophy, color: "text-amber-500" },
+          { label: "Entry Fee", value: `🪙${match.fee ?? 0}`, icon: Clock, color: "text-primary" },
+          { label: "Per Kill", value: match.perKill > 0 ? `🪙${match.perKill}` : "—", icon: Star, color: "text-green-600" },
           { label: "Slots Left", value: String(Math.max(max - joined, 0)), icon: Users, color: joined >= max ? "text-red-500" : "text-green-600" },
         ].map((stat, i) => {
           const Icon = stat.icon;
@@ -81,7 +81,7 @@ export default async function MatchDetailPage({ params }: { params: Promise<{ id
             {match.map && <div><div className="text-[10px] text-muted font-bold uppercase mb-1 flex items-center gap-1"><Map size={10} /> Map</div><div className="font-bold">{match.map}</div></div>}
             {match.serial && <div><div className="text-[10px] text-muted font-bold uppercase mb-1">Serial #</div><div className="font-bold">{match.serial}</div></div>}
             {match.time && <div><div className="text-[10px] text-muted font-bold uppercase mb-1">Match Time</div><div className="font-bold">{match.time}</div></div>}
-            {match.perKill > 0 && <div><div className="text-[10px] text-muted font-bold uppercase mb-1 flex items-center gap-1"><Swords size={10} /> Per Kill</div><div className="font-bold text-green-600">₹{match.perKill}</div></div>}
+            {match.perKill > 0 && <div><div className="text-[10px] text-muted font-bold uppercase mb-1 flex items-center gap-1"><Swords size={10} /> Per Kill</div><div className="font-bold text-green-600">🪙{match.perKill}</div></div>}
           </div>
         </div>
       )}
@@ -139,6 +139,49 @@ export default async function MatchDetailPage({ params }: { params: Promise<{ id
           <p className="text-sm text-foreground leading-relaxed">{match.description}</p>
         </div>
       )}
+
+      <div className="card-base">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-bold text-foreground flex items-center gap-2">
+            <Users size={16} className="text-primary" />
+            Joined Players
+          </h2>
+          <span className="text-[11px] font-bold text-muted">{joined}/{max}</span>
+        </div>
+        {joinedUsers.length === 0 ? (
+          <div className="text-center py-6 text-xs text-muted font-medium">
+            No players have joined yet. Be the first!
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
+            {[...joinedUsers]
+              .sort((a, b) => (a.slot ?? 0) - (b.slot ?? 0))
+              .map((u, i) => {
+                const isMe = u.userDocId === userId;
+                return (
+                  <div
+                    key={i}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs ${
+                      isMe ? "bg-primary/5 border-primary/30" : "bg-white border-border"
+                    }`}
+                  >
+                    <span className={`shrink-0 w-7 h-7 rounded-md grid place-items-center text-[11px] font-black ${
+                      isMe ? "bg-primary text-white" : "bg-gray-100 text-foreground"
+                    }`}>
+                      #{u.slot}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-bold truncate text-foreground">
+                        {u.ffName || "Player"} {isMe && <span className="text-primary">(You)</span>}
+                      </div>
+                      <div className="text-[10px] text-muted truncate">UID: {u.ffUid || "—"}</div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        )}
+      </div>
 
       <div className="card-base">
         <h2 className="font-bold mb-4 text-foreground">{userAlreadyJoined ? "Your Registration" : "Join This Match"}</h2>

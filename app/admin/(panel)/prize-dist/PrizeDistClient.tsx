@@ -96,7 +96,7 @@ export function PrizeDistClient({ matches }: { matches: any[] }) {
       {players.length > 0 && (
         <div className="space-y-3">
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700 font-medium">
-            Per Kill Price: <strong>₹{selectedMatch?.perKill ?? 0}</strong> · Total = (Kills × ₹{selectedMatch?.perKill ?? 0}) + Rank Prize + Extra
+            Per Kill Price: <strong>🪙{selectedMatch?.perKill ?? 0}</strong> · Total = (Kills × 🪙{selectedMatch?.perKill ?? 0}) + Rank Prize + Extra
           </div>
 
           <div className="bg-white border border-border rounded-xl overflow-x-auto">
@@ -105,9 +105,9 @@ export function PrizeDistClient({ matches }: { matches: any[] }) {
                 <tr>
                   <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-muted">Player</th>
                   <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-muted">Kills</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-muted">Rank Prize (₹)</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-muted">Extra (₹)</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-muted">Total (₹)</th>
+                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-muted">Rank Prize (🪙)</th>
+                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-muted">Extra (🪙)</th>
+                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-muted">Total (🪙)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -126,7 +126,7 @@ export function PrizeDistClient({ matches }: { matches: any[] }) {
                     <td className="px-4 py-2">
                       <input type="number" min="0" className="auth-input text-center w-24 py-1.5 text-sm" placeholder="0" value={p.extra ?? ""} onChange={(e) => updatePlayer(idx, "extra", Number(e.target.value))} />
                     </td>
-                    <td className="px-4 py-3 text-center font-black text-green-600">₹{getTotal(p)}</td>
+                    <td className="px-4 py-3 text-center font-black text-green-600">🪙{getTotal(p)}</td>
                   </tr>
                 ))}
               </tbody>

@@ -48,7 +48,7 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
 
   const handleDeposit = async () => {
     const amt = Number(amount);
-    if (!amt || amt < 10) { showMsg("error", "Minimum deposit is ₹10"); return; }
+    if (!amt || amt < 10) { showMsg("error", "Minimum deposit is 🪙10"); return; }
     setLoading(true);
     try {
       const loaded = await loadRazorpayScript();
@@ -74,7 +74,7 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
             amt
           );
           if (verifyRes.success) {
-            showMsg("success", `₹${amt} added to your deposit wallet!`);
+            showMsg("success", `🪙${amt} added to your deposit wallet!`);
             setAmount("");
             window.location.reload();
           } else {
@@ -96,7 +96,7 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
 
   const handleWithdraw = async () => {
     const amt = Number(amount);
-    if (!amt || amt < 100) { showMsg("error", "Minimum withdrawal is ₹100"); return; }
+    if (!amt || amt < 100) { showMsg("error", "Minimum withdrawal is 🪙100"); return; }
     if (!upiId.trim()) { showMsg("error", "Please enter your UPI ID"); return; }
     setLoading(true);
     try {
@@ -118,7 +118,7 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
     try {
       const result = await applyRedeemCode(userId, redeemCode.trim().toUpperCase());
       if (result.success) {
-        showMsg("success", `Code applied! ₹${result.amount} bonus added to your wallet.`);
+        showMsg("success", `Code applied! 🪙${result.amount} bonus added to your wallet.`);
         setRedeemCode("");
         setTimeout(() => window.location.reload(), 2000);
       } else {
@@ -178,16 +178,16 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
           {activeTab === "deposit" && (
             <div className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-0.5">Amount (₹)</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-0.5">Amount (🪙)</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted text-sm">₹</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted text-sm">🪙</span>
                   <input type="number" className="auth-input pl-8 text-lg font-bold" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} />
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-2">
                 {[50, 100, 200, 500].map((amt) => (
                   <button key={amt} onClick={() => setAmount(amt.toString())} className="py-2 rounded-lg border border-border text-xs font-bold text-muted hover:border-primary hover:text-primary transition-colors">
-                    +₹{amt}
+                    +🪙{amt}
                   </button>
                 ))}
               </div>
@@ -200,10 +200,10 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
           {activeTab === "withdraw" && (
             <div className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-0.5">Amount (₹)</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-0.5">Amount (🪙)</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted text-sm">₹</span>
-                  <input type="number" className="auth-input pl-8 text-lg font-bold" placeholder="Min ₹100" value={amount} onChange={(e) => setAmount(e.target.value)} />
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted text-sm">🪙</span>
+                  <input type="number" className="auth-input pl-8 text-lg font-bold" placeholder="Min 🪙100" value={amount} onChange={(e) => setAmount(e.target.value)} />
                 </div>
               </div>
               <div className="space-y-1.5">

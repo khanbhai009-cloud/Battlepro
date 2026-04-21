@@ -39,7 +39,7 @@ export default async function LeaderboardPage() {
                   <div className="font-bold text-foreground">{p.ffName ?? "Player"}</div>
                   <div className="text-xs text-muted">{p.email}</div>
                 </td>
-                <td className="px-4 py-3 text-right font-black text-green-600">₹{p.currentMonthWinnings ?? 0}</td>
+                <td className="px-4 py-3 text-right font-black text-green-600">🪙{p.currentMonthWinnings ?? 0}</td>
                 <td className="px-4 py-3 text-right">
                   {p.vipExpiry && new Date() < new Date(p.vipExpiry) && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">VIP 👑</span>}
                 </td>

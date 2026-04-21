@@ -88,7 +88,7 @@ export async function approveWithdrawal(withdrawalId: string) {
       });
     });
 
-    await sendTargetedPushNotification([userId], "Withdrawal Approved ✅", `Your ₹${amount} withdrawal has been approved!`);
+    await sendTargetedPushNotification([userId], "Withdrawal Approved ✅", `Your 🪙${amount} withdrawal has been approved!`);
     revalidateAll();
     return { success: true };
   } catch (error: any) {
@@ -112,7 +112,7 @@ export async function rejectWithdrawal(withdrawalId: string) {
       t.update(wRef, { status: "Rejected" });
     });
 
-    await sendTargetedPushNotification([userId], "Withdrawal Rejected ❌", `Your ₹${amount} withdrawal was rejected. Amount refunded.`);
+    await sendTargetedPushNotification([userId], "Withdrawal Rejected ❌", `Your 🪙${amount} withdrawal was rejected. Amount refunded.`);
     revalidateAll();
     return { success: true };
   } catch (error: any) {
@@ -163,12 +163,12 @@ export async function addBonusToUser(userId: string, amount: number) {
     await db.collection("transactions").add({
       userId,
       type: "Admin Bonus",
-      desc: `Admin added ₹${amount} bonus`,
+      desc: `Admin added 🪙${amount} bonus`,
       amount,
       status: "Success",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
-    await sendTargetedPushNotification([userId], "Bonus Added 🎁", `₹${amount} bonus has been added to your wallet!`);
+    await sendTargetedPushNotification([userId], "Bonus Added 🎁", `🪙${amount} bonus has been added to your wallet!`);
     revalidateAll();
     return { success: true };
   } catch (error: any) {
@@ -324,14 +324,14 @@ export async function creditMatchWinnings(matchId: string, results: { userId: st
       await db.collection("transactions").add({
         userId: r.userId,
         type: "Prize Distribution",
-        desc: `Prize: ${matchName} | Kills: ${r.kills} | Rank: ₹${r.rankPrize} | Extra: ₹${r.extra}`,
+        desc: `Prize: ${matchName} | Kills: ${r.kills} | Rank: 🪙${r.rankPrize} | Extra: 🪙${r.extra}`,
         amount: r.total,
         status: "Success",
         matchName,
         staffEmail: staffEmail ?? "ADMIN",
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
-      await sendTargetedPushNotification([r.userId], "Prize Credited 🏆", `₹${r.total} prize credited for ${matchName}!`);
+      await sendTargetedPushNotification([r.userId], "Prize Credited 🏆", `🪙${r.total} prize credited for ${matchName}!`);
     }
 
     await tRef.update({ status: "Results", closedAt: admin.firestore.FieldValue.serverTimestamp() });

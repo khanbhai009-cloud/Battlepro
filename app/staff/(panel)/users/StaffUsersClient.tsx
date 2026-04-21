@@ -60,7 +60,7 @@ export function StaffUsersClient({ users }: { users: any[] }) {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-right font-bold">₹{total}</td>
+                  <td className="px-4 py-3 text-right font-bold">🪙{total}</td>
                   <td className="px-4 py-3 text-right">
                     <button onClick={() => handleBlock(u.id, u.status ?? "Active")} className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${isBlocked ? "bg-red-100 text-red-600 border-red-200" : "bg-green-100 text-green-700 border-green-200"}`}>
                       {isBlocked ? "Blocked" : "Active"}

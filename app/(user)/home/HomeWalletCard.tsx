@@ -55,7 +55,7 @@ export function HomeWalletCard({ userId, totalBalance }: { userId: string; total
             100
           );
           if (verifyRes.success) {
-            alert("Payment successful! ₹100 added to your wallet.");
+            alert("Payment successful! 🪙100 added to your wallet.");
             window.location.reload();
           } else {
             alert("Payment verification failed. Contact support.");

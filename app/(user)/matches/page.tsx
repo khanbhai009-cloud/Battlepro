@@ -82,16 +82,16 @@ function MatchCard({ match, uid, userBalance }: { match: any; uid: string; userB
         <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
           <div>
             <div className="text-muted text-[10px] font-bold uppercase">Pool</div>
-            <div className="font-black text-foreground">₹{pool}</div>
+            <div className="font-black text-foreground">🪙{pool}</div>
           </div>
           <div>
             <div className="text-muted text-[10px] font-bold uppercase">Entry</div>
-            <div className="font-black text-foreground">₹{fee}</div>
+            <div className="font-black text-foreground">🪙{fee}</div>
           </div>
           {match.perKill > 0 && (
             <div>
               <div className="text-muted text-[10px] font-bold uppercase">Per Kill</div>
-              <div className="font-black text-green-600">₹{match.perKill}</div>
+              <div className="font-black text-green-600">🪙{match.perKill}</div>
             </div>
           )}
           {match.map && (

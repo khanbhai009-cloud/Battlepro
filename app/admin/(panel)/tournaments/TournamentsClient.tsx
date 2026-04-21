@@ -138,15 +138,15 @@ export function TournamentsClient({ tournaments, categories }: { tournaments: an
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Entry Fee (₹)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Entry Fee (🪙)</label>
               <input type="number" className="auth-input" placeholder="50" value={form.fee} onChange={(e) => f("fee", e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Prize Pool (₹)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Prize Pool (🪙)</label>
               <input type="number" className="auth-input" placeholder="5000" value={form.pool} onChange={(e) => f("pool", e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Per Kill (₹)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Per Kill (🪙)</label>
               <input type="number" className="auth-input" placeholder="5" value={form.perKill} onChange={(e) => f("perKill", e.target.value)} />
             </div>
             <div className="space-y-1.5">
@@ -223,7 +223,7 @@ export function TournamentsClient({ tournaments, categories }: { tournaments: an
                   <div className="flex gap-4 mt-1 text-xs text-muted font-medium flex-wrap">
                     <span>Pool: {formatCurrency(t.pool ?? t.prize ?? 0)}</span>
                     <span>Fee: {formatCurrency(t.fee ?? 0)}</span>
-                    <span>Kill: ₹{t.perKill ?? 0}</span>
+                    <span>Kill: 🪙{t.perKill ?? 0}</span>
                     <span>{(t.joinedUsers ?? []).length}/{t.max ?? 100} joined</span>
                     {t.map && <span>Map: {t.map}</span>}
                   </div>

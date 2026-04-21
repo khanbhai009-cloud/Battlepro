@@ -44,7 +44,7 @@ export function UsersClient({ users }: { users: any[] }) {
     const result = await addBonusToUser(bonusModal.userId, Number(bonusAmount));
     setBonusLoading(false);
     if (result.success) {
-      setMsg(`₹${bonusAmount} bonus added to ${bonusModal.name}`);
+      setMsg(`🪙${bonusAmount} bonus added to ${bonusModal.name}`);
       setBonusModal(null); setBonusAmount("");
       setTimeout(() => setMsg(null), 3000);
     }
@@ -95,7 +95,7 @@ export function UsersClient({ users }: { users: any[] }) {
               </div>
               <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <div className="text-right">
-                  <div className="text-sm font-black text-foreground">₹{total}</div>
+                  <div className="text-sm font-black text-foreground">🪙{total}</div>
                   <div className="text-[9px] text-muted">W:{user.wallets?.winning ?? 0} D:{user.wallets?.deposit ?? 0} B:{user.wallets?.bonus ?? 0}</div>
                 </div>
                 <button onClick={() => setBonusModal({ userId: user.id, name: user.ffName ?? "User" })} className="p-1.5 rounded-lg text-amber-500 hover:bg-amber-50" title="Add Bonus">
@@ -121,7 +121,7 @@ export function UsersClient({ users }: { users: any[] }) {
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
             <h3 className="font-bold">Add Bonus to {bonusModal.name}</h3>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Amount (₹)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Amount (🪙)</label>
               <input type="number" className="auth-input" placeholder="e.g. 50" value={bonusAmount} onChange={(e) => setBonusAmount(e.target.value)} autoFocus />
             </div>
             <div className="flex gap-3">

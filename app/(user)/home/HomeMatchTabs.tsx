@@ -81,7 +81,7 @@ export function HomeMatchTabs({ matches, userId }: { matches: any[]; userId: str
                   </div>
                   <h3 className="font-bold text-sm text-foreground truncate">{match.name}</h3>
                   <div className="flex items-center gap-3 text-xs text-muted mt-1">
-                    <span>Pool: ₹{pool}</span>
+                    <span>Pool: 🪙{pool}</span>
                     {myEntry?.slot && <span>Slot #{myEntry.slot}</span>}
                     {match.publishRoom && match.roomId && (
                       <span className="text-green-600 font-bold">Room: {match.roomId}</span>
