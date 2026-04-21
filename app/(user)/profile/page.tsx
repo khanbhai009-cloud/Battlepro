@@ -3,8 +3,7 @@ import { formatCurrency } from "@/lib/utils";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { destroySession } from "@/actions/session";
-import Link from "next/link";
-import { Trophy, Wallet, Star, GamepadIcon, LogOut, Crown, Copy, Gift } from "lucide-react";
+import { Trophy, Wallet, Star, GamepadIcon, LogOut, Gift } from "lucide-react";
 
 async function getUserData(uid: string) {
   try {
@@ -38,24 +37,8 @@ export default async function ProfilePage() {
   const matchesPlayed = user?.totalMatches ?? 0;
   const level = Math.floor(matchesPlayed / 10) + 1;
 
-  const isVip = user?.vipExpiry && new Date() < new Date(user.vipExpiry);
-  const vipExpiry = user?.vipExpiry ? new Date(user.vipExpiry).toLocaleDateString() : null;
-
   return (
     <div className="space-y-5 max-w-2xl">
-
-      {isVip && (
-        <div className="card-base bg-gradient-to-r from-amber-500 to-amber-600 border-amber-400 text-white">
-          <div className="flex items-center gap-3">
-            <Crown size={24} className="text-white" />
-            <div>
-              <div className="font-bold text-sm">VIP Member 👑</div>
-              <div className="text-xs text-amber-100">Valid till {vipExpiry}</div>
-            </div>
-            <Link href="/vip" className="ml-auto text-xs font-bold bg-white/20 rounded-lg px-3 py-1.5 hover:bg-white/30">VIP Store →</Link>
-          </div>
-        </div>
-      )}
 
       <div className="card-base flex flex-col sm:flex-row items-start sm:items-center gap-5">
         <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-white text-2xl font-black shrink-0">
@@ -64,7 +47,6 @@ export default async function ProfilePage() {
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-foreground truncate flex items-center gap-2">
             {user?.ffName ?? "Mysterious Warrior"}
-            {isVip && <Crown size={16} className="text-amber-500" />}
           </h1>
           <p className="text-sm text-muted truncate">{user?.email ?? uid}</p>
           <div className="flex items-center gap-2 mt-2 flex-wrap">

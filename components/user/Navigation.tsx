@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Trophy, Wallet, User, BarChart3, LogOut, Headset, Crown, MessageSquare } from "lucide-react";
+import { Home, Trophy, Wallet, User, BarChart3, LogOut, Headset, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "./NotificationBell";
 import { destroySession } from "@/actions/session";
@@ -12,20 +12,20 @@ const navItems = [
   { label: "Matches", href: "/matches", icon: Trophy },
   { label: "Rank", href: "/rank", icon: BarChart3 },
   { label: "Wallet", href: "/wallet", icon: Wallet },
-  { label: "VIP", href: "/vip", icon: Crown },
   { label: "Profile", href: "/profile", icon: User },
   { label: "Support", href: "/support", icon: Headset },
   { label: "Chat", href: "/chat", icon: MessageSquare },
 ];
 
+const bottomNavItems = navItems.slice(0, 5);
+
 export function BottomNav() {
   const pathname = usePathname();
-  const bottomItems = navItems.slice(0, 5);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border sm:hidden">
       <div className="flex justify-around items-center px-2 py-2 pb-[env(safe-area-inset-bottom,8px)]">
-        {bottomItems.map((item) => {
+        {bottomNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href);
           return (
@@ -38,10 +38,12 @@ export function BottomNav() {
               )}
             >
               <Icon size={21} strokeWidth={isActive ? 2.5 : 1.8} className="shrink-0" />
-              <span className={cn(
-                "text-[9px] font-bold uppercase tracking-wide truncate",
-                isActive ? "text-primary" : "text-muted"
-              )}>
+              <span
+                className={cn(
+                  "text-[9px] font-bold uppercase tracking-wide truncate",
+                  isActive ? "text-primary" : "text-muted"
+                )}
+              >
                 {item.label}
               </span>
             </Link>
