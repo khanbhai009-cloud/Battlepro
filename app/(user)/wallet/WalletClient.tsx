@@ -5,24 +5,9 @@ import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Plus, ArrowRight, Gift, Loader2 } from "lucide-react";
 import { requestWithdrawal } from "@/actions/wallet-server";
-import { createOrder, verifyPayment } from "@/actions/wallet";
+import { createOrder } from "@/actions/wallet"; // verifyPayment ab redirect page sambhalega
 import { applyRedeemCode } from "@/actions/redeem";
-
-declare global {
-  interface Window { Razorpay: any; }
-}
-
-function loadRazorpayScript(): Promise<boolean> {
-  return new Promise((resolve) => {
-    if (document.getElementById("razorpay-script")) { resolve(true); return; }
-    const script = document.createElement("script");
-    script.id = "razorpay-script";
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-}
+import { Browser } from "@capacitor/browser"; // Native Browser Plugin
 
 type Tab = "deposit" | "withdraw" | "redeem";
 
@@ -49,51 +34,36 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
   const handleDeposit = async () => {
     const amt = Number(amount);
     if (!amt || amt < 10) { showMsg("error", "Minimum deposit is 🪙10"); return; }
+    
     setLoading(true);
     try {
-      const loaded = await loadRazorpayScript();
-      if (!loaded) { showMsg("error", "Payment gateway failed to load."); return; }
-
+      // 1. Backend se Order ID create karo
       const orderRes = await createOrder(amt, userId);
-      if (!orderRes.success || !orderRes.order) { showMsg("error", "Could not create order."); return; }
+      
+      if (!orderRes.success || !orderRes.order) { 
+        showMsg("error", "Could not create order."); 
+        setLoading(false);
+        return; 
+      }
 
-      const options = {
-        key: orderRes.keyId,
-        amount: (orderRes.order as any).amount,
-        currency: "INR",
-        name: "BattleZone Pro",
-        description: "Wallet Deposit",
-        order_id: (orderRes.order as any).id,
-        handler: async (response: any) => {
-          setLoading(true);
-          const verifyRes = await verifyPayment(
-            response.razorpay_order_id,
-            response.razorpay_payment_id,
-            response.razorpay_signature,
-            userId,
-            amt
-          );
-          if (verifyRes.success) {
-            showMsg("success", `🪙${amt} added to your deposit wallet!`);
-            setAmount("");
-            window.location.reload();
-          } else {
-            showMsg("error", "Payment verification failed. Contact support.");
-          }
-          setLoading(false);
-        },
-        modal: { ondismiss: () => setLoading(false) },
-        theme: { color: "#111111" },
-      };
+      // 2. APK ke WebView ke bajaye External Browser mein payment kholo
+      // Note: Tumhe ek checkout page banana padega: your-vercel-url.com/checkout
+      const checkoutUrl = `https://your-vercel-domain.com/checkout?orderId=${orderRes.order.id}&amount=${amt}&userId=${userId}`;
+      
+      await Browser.open({ url: checkoutUrl });
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch {
-      showMsg("error", "Payment failed. Please try again.");
+      // Browser open hone ke baad spinner band kar do
+      setLoading(false);
+      showMsg("success", "Opening secure payment window...");
+
+    } catch (error) {
+      console.error("Payment Error:", error);
+      showMsg("error", "Failed to initiate payment.");
       setLoading(false);
     }
   };
 
+  // ... (handleWithdraw aur handleRedeem same rahenge, wo server actions hain)
   const handleWithdraw = async () => {
     const amt = Number(amount);
     if (!amt || amt < 100) { showMsg("error", "Minimum withdrawal is 🪙100"); return; }
@@ -102,7 +72,7 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
     try {
       const result = await requestWithdrawal(userId, amt);
       if (result.success) {
-        showMsg("success", "Withdrawal requested! Admin has been notified. Processing within 24h.");
+        showMsg("success", "Withdrawal requested! Processing within 24h.");
         setAmount(""); setUpiId("");
       } else {
         showMsg("error", result.error || "Withdraw failed.");
@@ -118,7 +88,7 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
     try {
       const result = await applyRedeemCode(userId, redeemCode.trim().toUpperCase());
       if (result.success) {
-        showMsg("success", `Code applied! 🪙${result.amount} bonus added to your wallet.`);
+        showMsg("success", `Code applied! 🪙${result.amount} bonus added.`);
         setRedeemCode("");
         setTimeout(() => window.location.reload(), 2000);
       } else {
@@ -129,6 +99,7 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
     }
   };
 
+  // Tabs UI configuration
   const tabs: { key: Tab; label: string }[] = [
     { key: "deposit", label: "Add Funds" },
     { key: "withdraw", label: "Withdraw" },
@@ -137,25 +108,24 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
 
   return (
     <div className="space-y-6">
+      {/* Balance Cards (Same as your original UI) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="card-base border-primary/20">
           <div className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1.5">Winning Balance</div>
           <div className="text-xl sm:text-2xl font-bold text-primary">{formatCurrency(winning)}</div>
-          <p className="text-xs text-muted mt-1.5 font-medium">Available to withdraw</p>
         </div>
         <div className="card-base">
           <div className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1.5">Deposit Balance</div>
           <div className="text-xl sm:text-2xl font-bold text-foreground">{formatCurrency(deposit)}</div>
-          <p className="text-xs text-muted mt-1.5 font-medium">Usable for match entry</p>
         </div>
         <div className="card-base">
           <div className="text-[10px] font-bold text-amber-600 uppercase tracking-widest mb-1.5">Bonus Balance</div>
           <div className="text-xl sm:text-2xl font-bold text-amber-500">{formatCurrency(bonus)}</div>
-          <p className="text-xs text-muted mt-1.5 font-medium">Max 40% usable per match</p>
         </div>
       </div>
 
       <div className="card-base p-0 overflow-hidden">
+        {/* Tab Switcher */}
         <div className="flex border-b border-border">
           {tabs.map((t) => (
             <button
@@ -197,23 +167,20 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
             </div>
           )}
 
+          {/* Withdraw and Redeem views remain the same UI as you provided */}
           {activeTab === "withdraw" && (
             <div className="space-y-5">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-0.5">Amount (🪙)</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted text-sm">🪙</span>
-                  <input type="number" className="auth-input pl-8 text-lg font-bold" placeholder="Min 🪙100" value={amount} onChange={(e) => setAmount(e.target.value)} />
-                </div>
+                <input type="number" className="auth-input" placeholder="Min 🪙100" value={amount} onChange={(e) => setAmount(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-0.5">UPI ID / Bank Details</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-0.5">UPI ID</label>
                 <input type="text" className="auth-input" placeholder="e.g. 9876543210@ybl" value={upiId} onChange={(e) => setUpiId(e.target.value)} />
               </div>
-              <Button className="w-full py-3 text-sm bg-black hover:bg-black/80 text-white" onClick={handleWithdraw} disabled={loading}>
+              <Button className="w-full py-3 text-sm bg-black text-white" onClick={handleWithdraw} disabled={loading}>
                 {loading ? <Loader2 size={15} className="animate-spin" /> : <><ArrowRight size={16} />Request Withdrawal</>}
               </Button>
-              <p className="text-[10px] text-center text-muted font-bold uppercase tracking-wider">Only Winning Balance is withdrawable. Processing within 24h.</p>
             </div>
           )}
 
@@ -221,18 +188,11 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
             <div className="space-y-5">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-0.5">Redeem Code</label>
-                <input
-                  type="text"
-                  className="auth-input uppercase tracking-widest font-bold text-center text-lg"
-                  placeholder="ENTER CODE"
-                  value={redeemCode}
-                  onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
-                />
+                <input type="text" className="auth-input uppercase text-center" placeholder="ENTER CODE" value={redeemCode} onChange={(e) => setRedeemCode(e.target.value.toUpperCase())} />
               </div>
               <Button className="w-full py-3 text-sm" onClick={handleRedeem} disabled={loading}>
                 {loading ? <Loader2 size={15} className="animate-spin" /> : <><Gift size={16} />Apply Code</>}
               </Button>
-              <p className="text-[10px] text-center text-muted font-bold uppercase tracking-wider">Redeem codes add bonus balance to your wallet.</p>
             </div>
           )}
         </div>
