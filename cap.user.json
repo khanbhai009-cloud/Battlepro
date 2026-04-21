@@ -1,0 +1,6 @@
+{
+  "appId": "com.battlepro.user",
+  "appName": "BattlePro Player",
+  "webDir": "dist",
+  "server": { "url": "https://battlepro.vercel.app/home", "cleartext": true }
+}
