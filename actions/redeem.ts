@@ -3,6 +3,10 @@
 import { getAdminDb, admin } from "@/lib/firebase-admin";
 import { revalidatePath } from "next/cache";
 
+function revalidateAll() {
+  revalidatePath("/", "layout");
+}
+
 export async function applyRedeemCode(userId: string, code: string) {
   try {
     const db = getAdminDb();
@@ -50,7 +54,8 @@ export async function applyRedeemCode(userId: string, code: string) {
       return { amount };
     });
 
-    revalidatePath("/wallet");
+    // Wallet balance changed — purge all panels
+    revalidateAll();
     return { success: true, amount: result.amount };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -85,7 +90,7 @@ export async function getRedeemCodes() {
   try {
     const db = getAdminDb();
     const snap = await db.collection("redeemCodes").orderBy("createdAt", "desc").limit(50).get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -95,6 +100,7 @@ export async function deactivateRedeemCode(code: string) {
   try {
     const db = getAdminDb();
     await db.collection("redeemCodes").doc(code).update({ active: false });
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };

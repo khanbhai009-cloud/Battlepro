@@ -4,6 +4,10 @@ import { getAdminDb, admin } from "@/lib/firebase-admin";
 import { sendTargetedPushNotification } from "@/lib/fcm-server";
 import { revalidatePath } from "next/cache";
 
+function revalidateAll() {
+  revalidatePath("/", "layout");
+}
+
 export async function joinMatch(matchId: string, userId: string, slot: number, ffName: string, ffUid: string) {
   try {
     const adminDb = getAdminDb();
@@ -19,27 +23,15 @@ export async function joinMatch(matchId: string, userId: string, slot: number, f
 
       const matchData = matchDoc.data()!;
       const userData = userDoc.data()!;
-      
+
       const joinedUsers = matchData.joinedUsers || [];
       const entryFee = Number(matchData.fee);
-      
-      // 1. Check if match is full
-      if (joinedUsers.length >= matchData.max) {
-        throw new Error("Match is full");
-      }
 
-      // 2. Check if slot is taken
-      if (joinedUsers.some((u: any) => u.slot === slot)) {
-        throw new Error(`Slot ${slot} is already taken`);
-      }
+      if (joinedUsers.length >= matchData.max) throw new Error("Match is full");
+      if (joinedUsers.some((u: any) => u.slot === slot)) throw new Error(`Slot ${slot} is already taken`);
+      if (joinedUsers.some((u: any) => u.userDocId === userId)) throw new Error("You have already joined this match");
 
-      // 3. Check if user already joined
-      if (joinedUsers.some((u: any) => u.userDocId === userId)) {
-        throw new Error("You have already joined this match");
-      }
-
-      // 4. Wallet Balance Check & Deduction
-      // Logic: Max 40% from bonus, rest from deposit/winning
+      // Wallet deduction — max 40% from bonus, rest from deposit/winning
       const wDep = Number(userData.wallets?.deposit || 0);
       const wWin = Number(userData.wallets?.winning || 0);
       const wBon = Number(userData.wallets?.bonus || 0);
@@ -48,11 +40,8 @@ export async function joinMatch(matchId: string, userId: string, slot: number, f
       const bonusToUse = Math.min(wBon, maxBonusAllowed);
       const remainingFee = entryFee - bonusToUse;
 
-      if ((wDep + wWin) < remainingFee) {
-        throw new Error("Insufficient balance");
-      }
+      if ((wDep + wWin) < remainingFee) throw new Error("Insufficient balance");
 
-      // 5. Update Wallets
       let newDep = wDep;
       let newWin = wWin;
       let newBon = wBon - bonusToUse;
@@ -73,7 +62,6 @@ export async function joinMatch(matchId: string, userId: string, slot: number, f
         "wallets.bonus": newBon,
       });
 
-      // 6. Add user to match
       const newPlayer = {
         userDocId: userId,
         ffName,
@@ -86,7 +74,6 @@ export async function joinMatch(matchId: string, userId: string, slot: number, f
         joinedUsers: admin.firestore.FieldValue.arrayUnion(newPlayer),
       });
 
-      // 7. Log Transaction
       const txnRef = adminDb.collection("transactions").doc();
       transaction.set(txnRef, {
         userId,
@@ -100,8 +87,8 @@ export async function joinMatch(matchId: string, userId: string, slot: number, f
       return { success: true };
     });
 
-    revalidatePath(`/matches/${matchId}`);
-    revalidatePath("/home");
+    // Purge cache for all panels so wallet balances and match slots reflect immediately
+    revalidateAll();
     return result;
   } catch (error: any) {
     console.error("Join Match Error:", error);
@@ -109,16 +96,11 @@ export async function joinMatch(matchId: string, userId: string, slot: number, f
   }
 }
 
-/**
- * Trigger 3 (Match Updates): Staff updates Room ID/Password.
- * Sends push notification ONLY to the users who joined this specific match.
- */
 export async function updateMatchRoomDetails(matchId: string, roomId: string, roomPass: string) {
   try {
     const adminDb = getAdminDb();
     const matchRef = adminDb.collection("tournaments").doc(matchId);
-    
-    // Using transaction to fetch participants then update room details
+
     const result = await adminDb.runTransaction(async (transaction) => {
       const matchDoc = await transaction.get(matchRef);
       if (!matchDoc.exists) throw new Error("Match not found");
@@ -127,25 +109,24 @@ export async function updateMatchRoomDetails(matchId: string, roomId: string, ro
       transaction.update(matchRef, {
         roomId,
         roomPass,
-        publishRoom: true, // Auto publish to players
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        publishRoom: true,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
       return { success: true, matchName: matchData.name, participants: matchData.joinedUsers || [] };
     });
 
-    // Send push notification safely outside transaction
     if (result.success && result.participants.length > 0) {
       const participantUids = result.participants.map((u: any) => u.userDocId);
       await sendTargetedPushNotification(
-        participantUids, 
-        `Room Ready: ${result.matchName} 🎮`, 
+        participantUids,
+        `Room Ready: ${result.matchName} 🎮`,
         `Room ID: ${roomId} | Pass: ${roomPass}. Good luck!`
       );
     }
-    
-    return { success: true };
 
+    revalidateAll();
+    return { success: true };
   } catch (error: any) {
     console.error("Update Match Room Error:", error);
     return { success: false, error: error.message };

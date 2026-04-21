@@ -10,6 +10,10 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
 });
 
+function revalidateAll() {
+  revalidatePath("/", "layout");
+}
+
 export async function createOrder(amount: number, userId: string) {
   try {
     const options = {
@@ -71,9 +75,8 @@ export async function verifyPayment(
         });
       });
 
-      revalidatePath("/wallet");
-      revalidatePath("/home");
-      revalidatePath("/profile");
+      // Invalidate ALL panels — wallet balance change must reflect everywhere
+      revalidateAll();
       return { success: true };
     } else {
       return { success: false, error: "Invalid signature" };

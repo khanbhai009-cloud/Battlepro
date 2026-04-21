@@ -4,6 +4,11 @@ import { getAdminDb, admin } from "@/lib/firebase-admin";
 import { sendTargetedPushNotification } from "@/lib/fcm-server";
 import { revalidatePath } from "next/cache";
 
+// ─── Helper: invalidate the entire Next.js cache across all panels ───────────
+function revalidateAll() {
+  revalidatePath("/", "layout");
+}
+
 export async function getAdminStats() {
   try {
     const db = getAdminDb();
@@ -49,7 +54,7 @@ export async function getPendingWithdrawals() {
         return { ...w, ffName: userDoc.data()?.ffName ?? "Player", email: userDoc.data()?.email ?? "", upiId: userDoc.data()?.upiId ?? "", bankDetails: userDoc.data()?.bankDetails };
       })
     );
-    return withUserData;
+    return JSON.parse(JSON.stringify(withUserData));
   } catch {
     return [];
   }
@@ -77,8 +82,7 @@ export async function approveWithdrawal(withdrawalId: string) {
     });
 
     await sendTargetedPushNotification([userId], "Withdrawal Approved ✅", `Your ₹${amount} withdrawal has been approved!`);
-    revalidatePath("/admin/withdrawals");
-    revalidatePath("/admin/dashboard");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -102,7 +106,7 @@ export async function rejectWithdrawal(withdrawalId: string) {
     });
 
     await sendTargetedPushNotification([userId], "Withdrawal Rejected ❌", `Your ₹${amount} withdrawal was rejected. Amount refunded.`);
-    revalidatePath("/admin/withdrawals");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -113,7 +117,7 @@ export async function getAllUsers() {
   try {
     const db = getAdminDb();
     const snap = await db.collection("users").orderBy("createdAt", "desc").limit(200).get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -123,7 +127,7 @@ export async function updateUserRole(userId: string, role: string) {
   try {
     const db = getAdminDb();
     await db.collection("users").doc(userId).update({ role });
-    revalidatePath("/admin/users");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -134,7 +138,7 @@ export async function blockUnblockUser(userId: string, status: string) {
   try {
     const db = getAdminDb();
     await db.collection("users").doc(userId).update({ status });
-    revalidatePath("/admin/users");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -158,7 +162,7 @@ export async function addBonusToUser(userId: string, amount: number) {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     await sendTargetedPushNotification([userId], "Bonus Added 🎁", `₹${amount} bonus has been added to your wallet!`);
-    revalidatePath("/admin/users");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -172,7 +176,7 @@ export async function grantVipToUser(userId: string, days: number) {
     expiry.setDate(expiry.getDate() + days);
     await db.collection("users").doc(userId).update({ vipExpiry: expiry.toISOString() });
     await sendTargetedPushNotification([userId], "VIP Activated 👑", `You have been granted VIP for ${days} days!`);
-    revalidatePath("/admin/users");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -183,7 +187,7 @@ export async function getAllTournaments() {
   try {
     const db = getAdminDb();
     const snap = await db.collection("tournaments").orderBy("createdAt", "desc").limit(100).get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -197,8 +201,7 @@ export async function createTournament(data: Record<string, any>) {
       joinedUsers: [],
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
-    revalidatePath("/matches");
-    revalidatePath("/admin/tournaments");
+    revalidateAll();
     return { success: true, id: ref.id };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -209,8 +212,7 @@ export async function updateTournament(id: string, data: Record<string, any>) {
   try {
     const db = getAdminDb();
     await db.collection("tournaments").doc(id).update({ ...data, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
-    revalidatePath("/matches");
-    revalidatePath("/admin/tournaments");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -221,8 +223,7 @@ export async function updateTournamentStatus(tournamentId: string, status: strin
   try {
     const db = getAdminDb();
     await db.collection("tournaments").doc(tournamentId).update({ status });
-    revalidatePath("/matches");
-    revalidatePath("/admin/tournaments");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -254,8 +255,7 @@ export async function deleteTournament(tournamentId: string) {
       }
     }
     await db.collection("tournaments").doc(tournamentId).delete();
-    revalidatePath("/matches");
-    revalidatePath("/admin/tournaments");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -269,7 +269,7 @@ export async function getLiveMatches() {
       .where("status", "in", ["live", "upcoming", "Upcoming", "Ongoing"])
       .orderBy("createdAt", "desc")
       .get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -282,7 +282,9 @@ export async function getOngoingMatchesForPrize() {
     const snap = await db.collection("tournaments")
       .where("status", "in", ["Ongoing", "live"])
       .get();
-    return snap.docs.map((d) => ({ id: d.id, name: d.data().name, joinedUsers: d.data().joinedUsers ?? [], perKill: d.data().perKill ?? 0 }));
+    return JSON.parse(JSON.stringify(
+      snap.docs.map((d) => ({ id: d.id, name: d.data().name, joinedUsers: d.data().joinedUsers ?? [], perKill: d.data().perKill ?? 0 }))
+    ));
   } catch {
     return [];
   }
@@ -321,8 +323,7 @@ export async function creditMatchWinnings(matchId: string, results: { userId: st
     }
 
     await tRef.update({ status: "Results", closedAt: admin.firestore.FieldValue.serverTimestamp() });
-    revalidatePath("/matches");
-    revalidatePath("/admin/prize-dist");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -334,7 +335,7 @@ export async function getBanners() {
   try {
     const db = getAdminDb();
     const snap = await db.collection("admin_banners").orderBy("createdAt", "desc").get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -348,8 +349,7 @@ export async function saveBanner(data: { url: string; link?: string }, editId?: 
     } else {
       await db.collection("admin_banners").add({ url: data.url, link: data.link ?? "", createdAt: admin.firestore.FieldValue.serverTimestamp() });
     }
-    revalidatePath("/");
-    revalidatePath("/home");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -360,7 +360,7 @@ export async function deleteBanner(id: string) {
   try {
     const db = getAdminDb();
     await db.collection("admin_banners").doc(id).delete();
-    revalidatePath("/home");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -372,7 +372,7 @@ export async function getGameCategories() {
   try {
     const db = getAdminDb();
     const snap = await db.collection("admin_games").get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -386,7 +386,7 @@ export async function saveGameCategory(data: { name: string; url: string }, edit
     } else {
       await db.collection("admin_games").add({ ...data, createdAt: admin.firestore.FieldValue.serverTimestamp() });
     }
-    revalidatePath("/home");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -397,7 +397,7 @@ export async function deleteGameCategory(id: string) {
   try {
     const db = getAdminDb();
     await db.collection("admin_games").doc(id).delete();
-    revalidatePath("/home");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -409,7 +409,7 @@ export async function getAppSchedule() {
   try {
     const db = getAdminDb();
     const doc = await db.collection("settings").doc("appStatus").get();
-    return doc.exists ? doc.data() : { status: "open", message: "" };
+    return doc.exists ? JSON.parse(JSON.stringify(doc.data())) : { status: "open", message: "" };
   } catch {
     return { status: "open", message: "" };
   }
@@ -419,6 +419,7 @@ export async function saveAppSchedule(data: { status: string; message: string; s
   try {
     const db = getAdminDb();
     await db.collection("settings").doc("appStatus").set({ ...data, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -430,7 +431,7 @@ export async function getStaffUsers() {
   try {
     const db = getAdminDb();
     const snap = await db.collection("staff_users").orderBy("createdAt", "desc").get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -442,6 +443,7 @@ export async function createStaffUser(data: { name: string; email: string; passw
     const existing = await db.collection("staff_users").where("email", "==", data.email).get();
     if (!existing.empty) throw new Error("Email already exists");
     await db.collection("staff_users").add({ ...data, createdAt: admin.firestore.FieldValue.serverTimestamp() });
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -452,6 +454,7 @@ export async function updateStaffUser(id: string, data: { name: string; email: s
   try {
     const db = getAdminDb();
     await db.collection("staff_users").doc(id).update(data);
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -462,6 +465,7 @@ export async function deleteStaffUser(id: string) {
   try {
     const db = getAdminDb();
     await db.collection("staff_users").doc(id).delete();
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -519,7 +523,7 @@ export async function searchUserTransactions(userIdOrEmail: string) {
       if (!usersSnap.empty) uid = usersSnap.docs[0].id;
     }
     const snap = await db.collection("transactions").where("userId", "==", uid).orderBy("createdAt", "desc").limit(50).get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -529,7 +533,7 @@ export async function getAllTransactions() {
   try {
     const db = getAdminDb();
     const snap = await db.collection("transactions").orderBy("createdAt", "desc").limit(100).get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -540,7 +544,7 @@ export async function getLeaderboard() {
   try {
     const db = getAdminDb();
     const snap = await db.collection("users").orderBy("currentMonthWinnings", "desc").limit(20).get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -557,13 +561,13 @@ export async function getGeneralSettings() {
       db.collection("settings").doc("referral").get(),
       db.collection("settings").doc("pricing").get(),
     ]);
-    return {
+    return JSON.parse(JSON.stringify({
       general: genDoc.exists ? genDoc.data() : {},
       socials: socialDoc.exists ? socialDoc.data() : {},
       withdrawLimits: withdrawDoc.exists ? withdrawDoc.data() : { min: 100, max: 10000 },
       referral: referralDoc.exists ? referralDoc.data() : { bonusAmount: 10 },
       pricing: pricingDoc.exists ? pricingDoc.data() : {},
-    };
+    }));
   } catch {
     return { general: {}, socials: {}, withdrawLimits: { min: 100, max: 10000 }, referral: { bonusAmount: 10 }, pricing: {} };
   }
@@ -573,7 +577,7 @@ export async function saveGeneralSettings(section: string, data: Record<string, 
   try {
     const db = getAdminDb();
     await db.collection("settings").doc(section).set({ ...data, updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
-    revalidatePath("/admin/settings");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -585,7 +589,7 @@ export async function getRedeemCodes() {
   try {
     const db = getAdminDb();
     const snap = await db.collection("redeem_codes").orderBy("createdAt", "desc").get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -600,6 +604,7 @@ export async function createRedeemCode(data: { code: string; amount: number; max
       usedBy: [],
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -610,6 +615,7 @@ export async function deleteRedeemCode(id: string) {
   try {
     const db = getAdminDb();
     await db.collection("redeem_codes").doc(id).delete();
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };

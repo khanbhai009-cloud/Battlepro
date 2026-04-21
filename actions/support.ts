@@ -4,6 +4,10 @@ import { getAdminDb, admin } from "@/lib/firebase-admin";
 import { sendAdminPushNotification } from "@/lib/fcm-server";
 import { revalidatePath } from "next/cache";
 
+function revalidateAll() {
+  revalidatePath("/", "layout");
+}
+
 export async function submitSupportTicket(userId: string, subject: string, message: string, category: string) {
   try {
     const db = getAdminDb();
@@ -23,11 +27,8 @@ export async function submitSupportTicket(userId: string, subject: string, messa
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    await sendAdminPushNotification(
-      "New Support Ticket 🎫",
-      `${ffName}: ${subject}`
-    );
-
+    await sendAdminPushNotification("New Support Ticket 🎫", `${ffName}: ${subject}`);
+    revalidateAll();
     return { success: true, ticketId: ticketRef.id };
   } catch (error: any) {
     return { success: false, error: error.message };
@@ -42,7 +43,7 @@ export async function getUserTickets(userId: string) {
       .orderBy("createdAt", "desc")
       .limit(20)
       .get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -52,7 +53,7 @@ export async function getAllTickets() {
   try {
     const db = getAdminDb();
     const snap = await db.collection("supportTickets").orderBy("createdAt", "desc").limit(100).get();
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return JSON.parse(JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
   } catch {
     return [];
   }
@@ -65,7 +66,7 @@ export async function updateTicketStatus(ticketId: string, status: string, admin
       status,
       ...(adminReply ? { adminReply, repliedAt: admin.firestore.FieldValue.serverTimestamp() } : {}),
     });
-    revalidatePath("/admin/support");
+    revalidateAll();
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };
