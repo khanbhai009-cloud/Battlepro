@@ -76,10 +76,13 @@ jobs:
           EOF
 
       - name: Generate Google Services JSON
+        env:
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
           mkdir -p android/app
-          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
-        continue-on-error: true
+          echo "$GOOGLE_SERVICES" > android/app/google-services.json
+          echo "=== Verify JSON valid hai ==="
+          python3 -c "import json; json.load(open('android/app/google-services.json')); print('✅ JSON valid!')"
 
       - name: Build ${{ matrix.variant.name }} APK
         timeout-minutes: 25
