@@ -33,6 +33,14 @@ jobs:
           distribution: 'zulu'
           cache: 'gradle'
 
+      - name: Fix Line Endings (CRLF to LF)
+        run: |
+          find android -name "gradlew" -type f -exec sed -i 's/\r$//' {} \;
+          find android -name "*.sh" -type f -exec sed -i 's/\r$//' {} \;
+          chmod +x android/gradlew
+          chmod -R +x android/gradle/wrapper
+          echo "Line endings fixed"
+
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
@@ -42,46 +50,33 @@ jobs:
           echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
         continue-on-error: true
 
+      - name: Copy ${{ matrix.variant.name }} Configuration
+        run: |
+          echo "Copying ${{ matrix.variant.config }} to capacitor.config.json"
+          cp ${{ matrix.variant.config }} capacitor.config.json
+          cat capacitor.config.json
+
+      - name: Sync Capacitor for ${{ matrix.variant.name }}
+        run: npx cap sync android
+
       - name: Build ${{ matrix.variant.name }} APK
         run: |
-          #!/bin/bash
-          set +e
-          
-          ROLE="${{ matrix.variant.name }}"
-          CONFIG="${{ matrix.variant.config }}"
-          OUTPUT="${{ matrix.variant.output }}"
-          
-          echo "=========================================="
-          echo "Building APK for: $ROLE"
-          echo "=========================================="
-          
-          # Copy config
-          echo "Copying $CONFIG to capacitor.config.json"
-          cp "$CONFIG" capacitor.config.json
-          
-          # Sync Capacitor
-          echo "Running npx cap sync android"
-          npx cap sync android
-          
-          # Fix Gradle permissions
-          echo "Fixing Gradle permissions"
-          chmod +x android/gradlew
-          sed -i 's/\r$//' android/gradlew
-          
-          # Build APK
-          echo "Building with Gradle"
-          cd android && ./gradlew assembleDebug --no-daemon
-          BUILD_STATUS=$?
+          cd android
+          echo "Starting Gradle build for ${{ matrix.variant.name }}..."
+          ./gradlew assembleDebug --no-daemon --stacktrace
+          BUILD_EXIT=$?
           cd ..
           
-          if [ $BUILD_STATUS -eq 0 ]; then
-            echo "Build successful for $ROLE"
-            cp android/app/build/outputs/apk/debug/app-debug.apk "$OUTPUT" || cp android/app/build/outputs/apk/debug/app.apk "$OUTPUT"
-            ls -lh "$OUTPUT"
-          else
-            echo "Build failed for $ROLE, exit code: $BUILD_STATUS"
-            exit $BUILD_STATUS
+          if [ $BUILD_EXIT -ne 0 ]; then
+            echo "Build failed with exit code: $BUILD_EXIT"
+            exit 1
           fi
+          
+          echo "Build completed successfully"
+          
+          # Find and copy APK
+          find android/app/build/outputs/apk -name "*.apk" | head -1 | xargs -I {} cp {} ${{ matrix.variant.output }}
+          ls -lh ${{ matrix.variant.output }} || echo "ERROR: APK not found"
 
       - name: Upload ${{ matrix.variant.name }} APK
         uses: actions/upload-artifact@v4
