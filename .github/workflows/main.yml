@@ -50,6 +50,7 @@ jobs:
         run: |
           rm -rf android
           npx cap add android
+          mkdir -p android/app/src/main/assets
 
       - name: Sync Capacitor
         run: npx cap sync android
@@ -89,7 +90,7 @@ jobs:
             --no-parallel \
             --max-workers=2 \
             --stacktrace
-          
+
           APK=$(find app/build/outputs/apk -name "*.apk" | head -1)
           echo "APK found: $APK"
           cp "$APK" ../${{ matrix.variant.output }}
