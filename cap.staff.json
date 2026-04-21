@@ -1,6 +1,6 @@
 {
   "appId": "com.battlepro.staff",
   "appName": "BattlePro Staff",
-  "webDir": "dist",
+  "webDir": "out",
   "server": { "url": "https://battlepro.vercel.app/staff/matches", "cleartext": true }
 }

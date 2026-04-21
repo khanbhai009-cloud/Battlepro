@@ -10,3 +10,7 @@
 .next/dev/cache/turbopack/e0739832/00001038.sst filter=lfs diff=lfs merge=lfs -text
 .next/dev/cache/turbopack/e0739832/00001886.sst filter=lfs diff=lfs merge=lfs -text
 .next/dev/cache/turbopack/e0739832/00001887.sst filter=lfs diff=lfs merge=lfs -text
+
+# Preserve execute permissions for shell scripts
+android/gradlew text eol=lf
+gradlew text eol=lf

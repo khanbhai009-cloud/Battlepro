@@ -1,0 +1,91 @@
+name: Build 3 APKs
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        variant: 
+          - { name: "admin", config: "cap.admin.json", output: "BattlePro-Admin.apk" }
+          - { name: "staff", config: "cap.staff.json", output: "BattlePro-Staff.apk" }
+          - { name: "user", config: "cap.user.json", output: "BattlePro-User.apk" }
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: 'gradle'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Generate Google Services JSON
+        run: |
+          mkdir -p android/app
+          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+        continue-on-error: true
+
+      - name: Build ${{ matrix.variant.name }} APK
+        run: |
+          #!/bin/bash
+          set +e
+          
+          ROLE="${{ matrix.variant.name }}"
+          CONFIG="${{ matrix.variant.config }}"
+          OUTPUT="${{ matrix.variant.output }}"
+          
+          echo "=========================================="
+          echo "Building APK for: $ROLE"
+          echo "=========================================="
+          
+          # Copy config
+          echo "Copying $CONFIG to capacitor.config.json"
+          cp "$CONFIG" capacitor.config.json
+          
+          # Sync Capacitor
+          echo "Running npx cap sync android"
+          npx cap sync android
+          
+          # Fix Gradle permissions
+          echo "Fixing Gradle permissions"
+          chmod +x android/gradlew
+          sed -i 's/\r$//' android/gradlew
+          
+          # Build APK
+          echo "Building with Gradle"
+          cd android && ./gradlew assembleDebug --no-daemon
+          BUILD_STATUS=$?
+          cd ..
+          
+          if [ $BUILD_STATUS -eq 0 ]; then
+            echo "Build successful for $ROLE"
+            cp android/app/build/outputs/apk/debug/app-debug.apk "$OUTPUT" || cp android/app/build/outputs/apk/debug/app.apk "$OUTPUT"
+            ls -lh "$OUTPUT"
+          else
+            echo "Build failed for $ROLE, exit code: $BUILD_STATUS"
+            exit $BUILD_STATUS
+          fi
+
+      - name: Upload ${{ matrix.variant.name }} APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: BattlePro-APKs
+          path: BattlePro-*.apk
+          retention-days: 7
