@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Trophy, Wallet, User, BarChart3, LogOut, Headset } from "lucide-react";
+import { Home, Trophy, Wallet, User, BarChart3, LogOut, Headset, Crown, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "./NotificationBell";
 import { destroySession } from "@/actions/session";
@@ -12,8 +12,10 @@ const navItems = [
   { label: "Matches", href: "/matches", icon: Trophy },
   { label: "Rank", href: "/rank", icon: BarChart3 },
   { label: "Wallet", href: "/wallet", icon: Wallet },
+  { label: "VIP", href: "/vip", icon: Crown },
   { label: "Profile", href: "/profile", icon: User },
   { label: "Support", href: "/support", icon: Headset },
+  { label: "Chat", href: "/chat", icon: MessageSquare },
 ];
 
 export function BottomNav() {

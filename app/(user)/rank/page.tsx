@@ -1,33 +1,24 @@
 import { getAdminDb } from "@/lib/firebase-admin";
-import { formatCurrency } from "@/lib/utils";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { Trophy, Medal, Star } from "lucide-react";
 
-// Set revalidation period for this page/data (24 hours)
-export const revalidate = 86400;
+export const revalidate = 0;
 
 async function getLeaderboard() {
   try {
-    const dbData = getAdminDb();
-    if (!dbData) return []; // Should not happen with current getAdminDb implementation but for safety
-
-    const playersSnap = await dbData
-      .collection("users")
-      .orderBy("wallets.winning", "desc")
-      .limit(50)
-      .get();
-
-    return playersSnap.docs.map((doc, index) => ({
-      id: doc.id,
-      rank: index + 1,
-      ...doc.data(),
-    }));
-  } catch (error) {
-    console.error("Leaderboard Fetch Error:", error);
+    const db = getAdminDb();
+    const snap = await db.collection("users").orderBy("currentMonthWinnings", "desc").limit(30).get();
+    return snap.docs.map((doc, index) => ({ id: doc.id, rank: index + 1, ...doc.data() }));
+  } catch {
     return [];
   }
 }
 
 export default async function RankPage() {
+  const cookieStore = await cookies();
+  const uid = cookieStore.get("session")?.value;
+  if (!uid) redirect("/login");
   const players = await getLeaderboard();
 
   return (
