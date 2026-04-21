@@ -8,15 +8,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    
+    timeout-minutes: 40
+
     strategy:
       matrix:
-        variant: 
+        variant:
           - { name: "admin", config: "cap.admin.json", output: "BattlePro-Admin.apk" }
           - { name: "staff", config: "cap.staff.json", output: "BattlePro-Staff.apk" }
-          - { name: "user", config: "cap.user.json", output: "BattlePro-User.apk" }
-    
+          - { name: "user",  config: "cap.user.json",  output: "BattlePro-User.apk"  }
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -40,18 +40,18 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Generate Google Services JSON
-        run: |
-          mkdir -p android/app
-          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
-        continue-on-error: true
-
-      - name: Copy ${{ matrix.variant.name }} Configuration
+      - name: Copy ${{ matrix.variant.name }} Config
         run: |
           cp ${{ matrix.variant.config }} capacitor.config.json
+          echo "=== Config being used ==="
           cat capacitor.config.json
 
-      - name: Sync Capacitor for ${{ matrix.variant.name }}
+      - name: Add Android Platform
+        run: |
+          rm -rf android
+          npx cap add android
+
+      - name: Sync Capacitor
         run: npx cap sync android
 
       - name: Fix gradlew
@@ -60,43 +60,40 @@ jobs:
           content = open('android/gradlew', 'rb').read()
           fixed = content.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
           open('android/gradlew', 'wb').write(fixed)
-          print('CRLF bytes fixed:', content.count(b'\r'))
+          print('Done. CRLF found:', content.count(b'\r'))
           "
           chmod +x android/gradlew
 
-      - name: Setup Gradle Properties
+      - name: Set Gradle Properties
         run: |
-          mkdir -p android
           cat > android/gradle.properties << EOF
           org.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=512m
           org.gradle.daemon=false
           org.gradle.parallel=false
-          org.gradle.caching=false
           android.useAndroidX=true
           android.enableJetifier=true
           EOF
 
-      - name: Build ${{ matrix.variant.name }} APK
-        timeout-minutes: 20
+      - name: Generate Google Services JSON
         run: |
-          cd android
-          echo "Starting Gradle build for ${{ matrix.variant.name }}..."
-          ./gradlew assembleDebug \
+          mkdir -p android/app
+          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+        continue-on-error: true
+
+      - name: Build ${{ matrix.variant.name }} APK
+        timeout-minutes: 25
+        working-directory: android
+        run: |
+          bash gradlew assembleDebug \
             --no-daemon \
             --no-parallel \
             --max-workers=2 \
-            --stacktrace \
-            --info 2>&1 | tail -100
-          BUILD_EXIT=${PIPESTATUS[0]}
-          cd ..
+            --stacktrace
           
-          if [ $BUILD_EXIT -ne 0 ]; then
-            echo "Build failed: $BUILD_EXIT"
-            exit 1
-          fi
-          
-          find android/app/build/outputs/apk -name "*.apk" | head -1 | xargs -I {} cp {} ${{ matrix.variant.output }}
-          ls -lh ${{ matrix.variant.output }} || echo "ERROR: APK not found"
+          APK=$(find app/build/outputs/apk -name "*.apk" | head -1)
+          echo "APK found: $APK"
+          cp "$APK" ../${{ matrix.variant.output }}
+          ls -lh ../${{ matrix.variant.output }}
 
       - name: Upload ${{ matrix.variant.name }} APK
         uses: actions/upload-artifact@v4
