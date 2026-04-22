@@ -25,7 +25,7 @@ export default async function UserLayout({
         {/* Mobile-only sticky top navbar */}
         <TopNavbar userId={userId} />
 
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-24 sm:pb-8 w-full flex-1">
+        <div className="max-w-5xl mx-auto w-full flex-1 pb-24 sm:px-6 sm:py-8 sm:pb-8">
           {children}
         </div>
       </main>
