@@ -27,10 +27,6 @@ export default async function WalletPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-1 text-foreground">My Wallet</h1>
-        <p className="text-muted text-sm font-medium">Manage your funds and review past transactions.</p>
-      </div>
       <WalletClient userId={uid} winning={winning} deposit={deposit} bonus={bonus} />
     </div>
   );
