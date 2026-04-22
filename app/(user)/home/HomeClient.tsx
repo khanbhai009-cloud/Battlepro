@@ -57,8 +57,39 @@ export default function HomeClient({
     <div className="min-h-[100dvh] bg-[#ffffff] text-[#000000] space-y-6">
       {/* Banners — empty-state safe */}
       {initialBanners.length > 0 && (
-        <div className="flex overflow-x-auto scroll-snap-type-x-mandatory gap-4 px-4 py-4 scroll-behavior-smooth">
+        <div className="px-4 py-4">
           <HomeBanners banners={initialBanners} />
+        </div>
+      )}
+
+      {/* Esports Categories */}
+      {initialGames.length > 0 && (
+        <div>
+          <h2 className="px-4 text-base font-bold text-[#000000] flex items-center gap-2 mb-3">
+            <i className="fas fa-trophy text-[#ff8c00]"></i> Esports Categories
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 px-4 pb-4">
+            {initialGames.map((game: any) => (
+              <Link key={game.id} href={`/matches?category=${encodeURIComponent(game.name)}`}>
+                <div className="bg-[#f8f9fa] border border-[#ff8c00] rounded-xl overflow-hidden cursor-pointer transition-all hover:shadow-lg shadow-md hover:scale-105 transform">
+                  {game.url ? (
+                    <SafeImage
+                      src={game.url}
+                      alt={game.name}
+                      className="w-full aspect-[16/9] object-cover"
+                    />
+                  ) : (
+                    <div className="w-full aspect-[16/9] bg-[#ff8c00]/10 flex items-center justify-center text-sm font-black text-[#ff8c00]">
+                      {(game.name ?? "?").slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="px-3 py-3 text-sm font-bold text-[#000000] text-center bg-[#f8f9fa]">
+                    {game.name}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 
@@ -81,7 +112,7 @@ export default function HomeClient({
               View All
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 px-4">
             {liveMatches.slice(0, 4).map((match: any) => {
               const joined = (match.joinedUsers ?? []).length;
               const max = match.max ?? 100;
@@ -96,30 +127,30 @@ export default function HomeClient({
               return (
                 <div
                   key={match.id}
-                  className="bg-[#f8f9fa] border border-[#e9ecef] rounded-xl p-4 hover:border-[#ff8c00]/20 transition-all cursor-pointer shadow-md"
+                  className="bg-[#f8f9fa] border border-[#e9ecef] rounded-xl p-5 hover:border-[#ff8c00]/20 transition-all cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                   onClick={() => router.push(`/matches/${match.id}`)}
                 >
                   {match.banner && (
                     <SafeImage
                       src={match.banner}
                       alt={match.name}
-                      className="w-full h-24 object-cover rounded-xl mb-3"
+                      className="w-full aspect-[16/9] object-cover rounded-xl mb-4 border-2 border-[#e9ecef] shadow-sm"
                     />
                   )}
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="flex justify-between items-start mb-3">
                     <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                      className={`text-xs px-3 py-1 rounded-full font-bold ${
                         STATUS_COLORS[statusKey] ?? "bg-gray-100 text-gray-500"
                       }`}
                     >
                       {match.status}
                     </span>
-                    <span className="text-[10px] font-bold text-[#6c757d]">
+                    <span className="text-xs font-bold text-[#6c757d]">
                       {match.category ?? match.game} · {match.type ?? match.mode}
                     </span>
                   </div>
-                  <h3 className="font-bold text-sm mb-2 line-clamp-1 text-[#000000]">{match.name}</h3>
-                  <div className="flex justify-between text-xs text-[#6c757d] mb-2">
+                  <h3 className="font-bold text-base mb-3 line-clamp-1 text-[#000000]">{match.name}</h3>
+                  <div className="flex justify-between text-sm text-[#6c757d] mb-3">
                     <span>
                       Pool: <strong className="text-[#000000]">🪙{pool}</strong>
                     </span>
@@ -132,13 +163,13 @@ export default function HomeClient({
                       </span>
                     )}
                   </div>
-                  <div className="h-1.5 bg-[#e9ecef] rounded-full overflow-hidden">
+                  <div className="h-2 bg-[#e9ecef] rounded-full overflow-hidden mb-2">
                     <div
-                      className="h-full bg-[#ff8c00] rounded-full"
+                      className="h-full bg-[#ff8c00] rounded-full transition-all duration-300"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <div className="text-[10px] text-[#6c757d] mt-1.5 font-medium">
+                  <div className="text-xs text-[#6c757d] mb-3 font-medium">
                     {joined}/{max} joined
                   </div>
                   <MatchJoinCTA
@@ -152,37 +183,6 @@ export default function HomeClient({
                 </div>
               );
             })}
-          </div>
-        </div>
-      )}
-
-      {/* Esports Categories */}
-      {initialGames.length > 0 && (
-        <div>
-          <h2 className="px-4 text-base font-bold text-[#000000] flex items-center gap-2 mb-3">
-            <i className="fas fa-trophy text-[#ff8c00]"></i> Esports Categories
-          </h2>
-          <div className="grid grid-cols-2 gap-4 px-4 pb-4">
-            {initialGames.map((game: any) => (
-              <Link key={game.id} href={`/matches?category=${encodeURIComponent(game.name)}`}>
-                <div className="bg-[#f8f9fa] border border-[#ff8c00] rounded-xl overflow-hidden cursor-pointer transition-all hover:shadow-md">
-                  {game.url ? (
-                    <SafeImage
-                      src={game.url}
-                      alt={game.name}
-                      className="w-full aspect-[16/9] object-cover"
-                    />
-                  ) : (
-                    <div className="w-full aspect-[16/9] bg-[#ff8c00]/10 flex items-center justify-center text-xs font-black text-[#ff8c00]">
-                      {(game.name ?? "?").slice(0, 2).toUpperCase()}
-                    </div>
-                  )}
-                  <div className="px-3 py-2 text-xs font-bold text-[#000000] text-center bg-[#f8f9fa]">
-                    {game.name}
-                  </div>
-                </div>
-              </Link>
-            ))}
           </div>
         </div>
       )}

@@ -61,12 +61,12 @@ export function HomeMatchTabs({ matches, userId }: { matches: any[]; userId: str
           };
           return (
             <Link key={match.id} href={`/matches/${match.id}`}>
-              <div className="bg-[#f8f9fa] border border-[#e9ecef] rounded-xl p-3 hover:border-[#ff8c00]/20 transition-all cursor-pointer flex items-center gap-3 shadow-md">
+              <div className="bg-[#f8f9fa] border border-[#e9ecef] rounded-xl p-3 hover:border-[#ff8c00]/20 transition-all cursor-pointer flex items-center gap-3 shadow-md hover:shadow-lg">
                 {match.banner && (
                   <SafeImage
                     src={match.banner}
                     alt={match.name ?? ""}
-                    className="w-14 h-14 rounded-xl object-cover shrink-0"
+                    className="w-16 h-16 rounded-xl object-cover shrink-0 border-2 border-[#e9ecef]"
                   />
                 )}
                 <div className="flex-1 min-w-0">

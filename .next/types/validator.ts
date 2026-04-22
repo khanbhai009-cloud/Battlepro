@@ -416,6 +416,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/api/razorpay-key/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/razorpay-key">> = Specific
+  const handler = {} as typeof import("../../app/api/razorpay-key/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/api/verify-payment/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/verify-payment">> = Specific
+  const handler = {} as typeof import("../../app/api/verify-payment/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 
 
 
