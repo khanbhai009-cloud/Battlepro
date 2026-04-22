@@ -27,10 +27,10 @@ export function HomeBanners({ banners }: { banners: { id: string; url: string; l
           <div key={b.id} className="flex-shrink-0 w-full aspect-[16/9] bg-[#f8f9fa] border border-[#e9ecef] cursor-pointer shadow-lg">
             {b.link ? (
               <a href={b.link} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-                <SafeImage src={b.url} alt="banner" className="w-full h-full object-cover rounded-xl" />
+                <SafeImage src={b.url} alt="banner" className="w-full h-full object-fill rounded-xl" />
               </a>
             ) : (
-              <SafeImage src={b.url} alt="banner" className="w-full h-full object-cover rounded-xl" />
+              <SafeImage src={b.url} alt="banner" className="w-full h-full object-fill rounded-xl" />
             )}
           </div>
         ))}

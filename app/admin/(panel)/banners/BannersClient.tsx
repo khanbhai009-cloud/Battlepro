@@ -53,7 +53,7 @@ export function BannersClient({ banners }: { banners: any[] }) {
               <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Image URL *</label>
               <input className="auth-input" placeholder="https://imgur.com/banner.jpg" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
             </div>
-            {form.url && <img src={form.url} alt="preview" className="w-full h-32 object-cover rounded-lg border border-border" onError={(e) => (e.currentTarget.style.display = "none")} />}
+            {form.url && <img src={form.url} alt="preview" className="w-full h-32 object-fill rounded-lg border border-border" onError={(e) => (e.currentTarget.style.display = "none")} />}
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold uppercase tracking-widest text-muted">Target Link (Optional)</label>
               <input className="auth-input" placeholder="https://instagram.com/..." value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} />
@@ -76,7 +76,7 @@ export function BannersClient({ banners }: { banners: any[] }) {
           </div>
         ) : list.map((b) => (
           <div key={b.id} className="bg-white border border-border rounded-xl overflow-hidden">
-            <img src={b.url} alt="banner" className="w-full h-28 object-cover" onError={(e) => { e.currentTarget.src = ""; e.currentTarget.style.background = "#f3f4f6"; }} />
+            <img src={b.url} alt="banner" className="w-full h-28 object-fill" onError={(e) => { e.currentTarget.src = ""; e.currentTarget.style.background = "#f3f4f6"; }} />
             <div className="p-3 flex justify-between items-center">
               <p className="text-xs text-muted truncate flex-1">{b.link || "No link"}</p>
               <div className="flex gap-1 ml-2">

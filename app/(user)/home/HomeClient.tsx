@@ -76,7 +76,7 @@ export default function HomeClient({
                     <SafeImage
                       src={game.url}
                       alt={game.name}
-                      className="w-full aspect-[16/9] object-cover"
+                      className="w-full aspect-[16/9] object-fill"
                     />
                   ) : (
                     <div className="w-full aspect-[16/9] bg-[#ff8c00]/10 flex items-center justify-center text-sm font-black text-[#ff8c00]">
@@ -134,7 +134,7 @@ export default function HomeClient({
                     <SafeImage
                       src={match.banner}
                       alt={match.name}
-                      className="w-full aspect-[16/9] object-cover rounded-xl mb-4 border-2 border-[#e9ecef] shadow-sm"
+                      className="w-full aspect-[16/9] object-fill rounded-xl mb-4 border-2 border-[#e9ecef] shadow-sm"
                     />
                   )}
                   <div className="flex justify-between items-start mb-3">

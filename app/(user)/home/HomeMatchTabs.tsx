@@ -66,7 +66,7 @@ export function HomeMatchTabs({ matches, userId }: { matches: any[]; userId: str
                   <SafeImage
                     src={match.banner}
                     alt={match.name ?? ""}
-                    className="w-16 h-16 rounded-xl object-cover shrink-0 border-2 border-[#e9ecef]"
+                    className="w-16 h-16 rounded-xl object-fill shrink-0 border-2 border-[#e9ecef]"
                   />
                 )}
                 <div className="flex-1 min-w-0">

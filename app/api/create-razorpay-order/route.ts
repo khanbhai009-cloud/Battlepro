@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+function getRazorpayClient() {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    throw new Error("Razorpay credentials not configured");
+  }
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +18,8 @@ export async function POST(request: NextRequest) {
     if (!orderId || !amount || !userId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+
+    const razorpay = getRazorpayClient();
 
     // Create Razorpay order
     const options = {

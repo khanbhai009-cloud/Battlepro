@@ -5,10 +5,15 @@ import crypto from "crypto";
 import { getAdminDb, admin } from "@/lib/firebase-admin";
 import { revalidatePath } from "next/cache";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+function getRazorpayClient() {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    throw new Error("Razorpay credentials not configured");
+  }
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  });
+}
 
 function revalidateAll() {
   revalidatePath("/", "layout");
@@ -16,6 +21,7 @@ function revalidateAll() {
 
 export async function createOrder(amount: number, userId: string) {
   try {
+    const razorpay = getRazorpayClient();
     const options = {
       amount: amount * 100,
       currency: "INR",
