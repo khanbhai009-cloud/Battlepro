@@ -47,8 +47,7 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
       }
 
       // 2. APK ke WebView ke bajaye External Browser mein payment kholo
-      // Note: Tumhe ek checkout page banana padega: your-vercel-url.com/checkout
-      const checkoutUrl = `https://your-vercel-domain.com/checkout?orderId=${orderRes.order.id}&amount=${amt}&userId=${userId}`;
+      const checkoutUrl = `https://battlepro.vercel.app/payment/checkout?orderId=${orderRes.order.id}&amount=${amt}&userId=${userId}`;
       
       await Browser.open({ url: checkoutUrl });
 
@@ -150,8 +149,7 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted ml-0.5">Amount (🪙)</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted text-sm">🪙</span>
-                  <input type="number" className="auth-input pl-8 text-lg font-bold" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} />
+                  <input type="number" className="auth-input px-4 text-lg font-bold" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} />
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-2">
