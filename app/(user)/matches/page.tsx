@@ -61,7 +61,7 @@ function MatchCard({ match, uid, userBalance }: { match: any; uid: string; userB
           <SafeImage
             src={match.banner}
             alt={match.name}
-            className="w-full h-28 object-cover rounded-2xl mb-3"
+            className="w-full aspect-[16/9] object-fill rounded-2xl mb-3"
           />
         )}
         <div className="flex justify-between items-start mb-3">
@@ -169,10 +169,6 @@ export default async function MatchesPage({
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold text-foreground">{category || "All Tournaments"}</h1>
-        <p className="text-muted text-xs mt-0.5">{filtered.length} matches found</p>
-      </div>
-
       {/* Horizontal-scrollable filter tabs */}
       <div className="overflow-x-auto scrollbar-hide -mx-1 px-1">
         <div className="flex gap-1 bg-gray-100 p-1 rounded-xl min-w-max">
