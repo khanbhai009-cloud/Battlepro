@@ -54,13 +54,19 @@ export default function HomeClient({
   );
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-[100dvh] bg-[#ffffff] text-[#000000] space-y-6">
       {/* Banners — empty-state safe */}
-      {initialBanners.length > 0 && <HomeBanners banners={initialBanners} />}
+      {initialBanners.length > 0 && (
+        <div className="flex overflow-x-auto scroll-snap-type-x-mandatory gap-4 px-4 py-4 scroll-behavior-smooth">
+          <HomeBanners banners={initialBanners} />
+        </div>
+      )}
 
       {/* My Matches */}
       <div>
-        <h2 className="text-base font-bold text-foreground mb-3">My Matches</h2>
+        <h2 className="px-4 text-base font-bold text-[#000000] flex items-center gap-2 mb-3">
+          <i className="fas fa-gamepad text-[#ff8c00]"></i> My Matches
+        </h2>
         <HomeMatchTabs matches={myMatches} userId={userId} />
       </div>
 
@@ -68,12 +74,14 @@ export default function HomeClient({
       {liveMatches.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-foreground">Live &amp; Upcoming</h2>
-            <Link href="/matches" className="text-primary text-xs font-bold hover:underline">
+            <h2 className="px-4 text-base font-bold text-[#000000] flex items-center gap-2">
+              <i className="fas fa-fire text-[#ff8c00]"></i> Live & Upcoming
+            </h2>
+            <Link href="/matches" className="text-[#ff8c00] text-xs font-bold hover:underline mr-4">
               View All
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4">
             {liveMatches.slice(0, 4).map((match: any) => {
               const joined = (match.joinedUsers ?? []).length;
               const max = match.max ?? 100;
@@ -88,14 +96,14 @@ export default function HomeClient({
               return (
                 <div
                   key={match.id}
-                  className="card-base hover:border-primary/20 transition-all cursor-pointer"
+                  className="bg-[#f8f9fa] border border-[#e9ecef] rounded-xl p-4 hover:border-[#ff8c00]/20 transition-all cursor-pointer shadow-md"
                   onClick={() => router.push(`/matches/${match.id}`)}
                 >
                   {match.banner && (
                     <SafeImage
                       src={match.banner}
                       alt={match.name}
-                      className="w-full h-24 object-cover rounded-2xl mb-3"
+                      className="w-full h-24 object-cover rounded-xl mb-3"
                     />
                   )}
                   <div className="flex justify-between items-start mb-2">
@@ -106,31 +114,31 @@ export default function HomeClient({
                     >
                       {match.status}
                     </span>
-                    <span className="text-[10px] font-bold text-muted">
+                    <span className="text-[10px] font-bold text-[#6c757d]">
                       {match.category ?? match.game} · {match.type ?? match.mode}
                     </span>
                   </div>
-                  <h3 className="font-bold text-sm mb-2 line-clamp-1">{match.name}</h3>
-                  <div className="flex justify-between text-xs text-muted mb-2">
+                  <h3 className="font-bold text-sm mb-2 line-clamp-1 text-[#000000]">{match.name}</h3>
+                  <div className="flex justify-between text-xs text-[#6c757d] mb-2">
                     <span>
-                      Pool: <strong className="text-foreground">🪙{pool}</strong>
+                      Pool: <strong className="text-[#000000]">🪙{pool}</strong>
                     </span>
                     <span>
-                      Fee: <strong className="text-foreground">🪙{fee}</strong>
+                      Fee: <strong className="text-[#000000]">🪙{fee}</strong>
                     </span>
                     {match.perKill > 0 && (
                       <span>
-                        Kill: <strong className="text-green-600">🪙{match.perKill}</strong>
+                        Kill: <strong className="text-[#28a745]">🪙{match.perKill}</strong>
                       </span>
                     )}
                   </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-[#e9ecef] rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-primary rounded-full"
+                      className="h-full bg-[#ff8c00] rounded-full"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <div className="text-[10px] text-muted mt-1.5 font-medium">
+                  <div className="text-[10px] text-[#6c757d] mt-1.5 font-medium">
                     {joined}/{max} joined
                   </div>
                   <MatchJoinCTA
@@ -151,25 +159,27 @@ export default function HomeClient({
       {/* Esports Categories */}
       {initialGames.length > 0 && (
         <div>
-          <h2 className="text-base font-bold text-foreground mb-3">Esports Categories</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <h2 className="px-4 text-base font-bold text-[#000000] flex items-center gap-2 mb-3">
+            <i className="fas fa-trophy text-[#ff8c00]"></i> Esports Categories
+          </h2>
+          <div className="grid grid-cols-2 gap-4 px-4 pb-4">
             {initialGames.map((game: any) => (
               <Link key={game.id} href={`/matches?category=${encodeURIComponent(game.name)}`}>
-                <div className="bg-white border border-border rounded-2xl flex flex-col items-center gap-3 hover:border-primary/30 transition-all cursor-pointer">
+                <div className="bg-[#f8f9fa] border border-[#ff8c00] rounded-xl overflow-hidden cursor-pointer transition-all hover:shadow-md">
                   {game.url ? (
                     <SafeImage
                       src={game.url}
                       alt={game.name}
-                      className="w-full h-full object-cover rounded-xl"
+                      className="w-full aspect-[16/9] object-cover"
                     />
                   ) : (
-                    <div className="w-full aspect-[16/9] rounded-2xl bg-primary/10 flex items-center justify-center text-xs font-black text-primary">
+                    <div className="w-full aspect-[16/9] bg-[#ff8c00]/10 flex items-center justify-center text-xs font-black text-[#ff8c00]">
                       {(game.name ?? "?").slice(0, 2).toUpperCase()}
                     </div>
                   )}
-                  <span className="text-sm font-bold text-foreground text-center line-clamp-1 w-full px-4 pb-4">
+                  <div className="px-3 py-2 text-xs font-bold text-[#000000] text-center bg-[#f8f9fa]">
                     {game.name}
-                  </span>
+                  </div>
                 </div>
               </Link>
             ))}

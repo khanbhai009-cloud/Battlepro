@@ -17,9 +17,9 @@ export function HomeMatchTabs({ matches, userId }: { matches: any[]; userId: str
 
   if (matches.length === 0) {
     return (
-      <div className="text-center py-8 bg-white rounded-2xl border border-dashed border-border">
-        <p className="text-muted text-sm">You haven't joined any matches yet.</p>
-        <Link href="/matches" className="text-primary text-sm font-bold mt-2 inline-block hover:underline">
+      <div className="text-center py-8 bg-[#f8f9fa] rounded-xl border border-dashed border-[#e9ecef] mx-4">
+        <p className="text-[#6c757d] text-sm">You haven't joined any matches yet.</p>
+        <Link href="/matches" className="text-[#ff8c00] text-sm font-bold mt-2 inline-block hover:underline">
           Browse Matches →
         </Link>
       </div>
@@ -27,14 +27,14 @@ export function HomeMatchTabs({ matches, userId }: { matches: any[]; userId: str
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex gap-2 bg-gray-100 rounded-xl p-1">
+    <div className="space-y-3 px-4">
+      <div className="flex gap-0 bg-[#f0f0f0] rounded-xl p-1 border border-[#e9ecef]">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              activeTab === tab ? "bg-white text-foreground shadow-sm" : "text-muted"
+            className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
+              activeTab === tab ? "bg-[#ff8c00] text-white shadow-sm" : "text-[#6c757d]"
             }`}
           >
             {tab}
@@ -43,8 +43,8 @@ export function HomeMatchTabs({ matches, userId }: { matches: any[]; userId: str
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-6 bg-white rounded-xl border border-dashed border-border">
-          <p className="text-muted text-xs">No {activeTab.toLowerCase()} matches.</p>
+        <div className="text-center py-6 bg-[#f8f9fa] rounded-xl border border-dashed border-[#e9ecef]">
+          <p className="text-[#6c757d] text-xs">No {activeTab.toLowerCase()} matches.</p>
         </div>
       ) : (
         filtered.map((match: any) => {
@@ -61,7 +61,7 @@ export function HomeMatchTabs({ matches, userId }: { matches: any[]; userId: str
           };
           return (
             <Link key={match.id} href={`/matches/${match.id}`}>
-              <div className="card-base hover:border-primary/20 transition-all cursor-pointer flex items-center gap-3">
+              <div className="bg-[#f8f9fa] border border-[#e9ecef] rounded-xl p-3 hover:border-[#ff8c00]/20 transition-all cursor-pointer flex items-center gap-3 shadow-md">
                 {match.banner && (
                   <SafeImage
                     src={match.banner}
@@ -79,16 +79,16 @@ export function HomeMatchTabs({ matches, userId }: { matches: any[]; userId: str
                       {match.status}
                     </span>
                   </div>
-                  <h3 className="font-bold text-sm text-foreground truncate">{match.name}</h3>
-                  <div className="flex items-center gap-3 text-xs text-muted mt-1">
+                  <h3 className="font-bold text-sm text-[#000000] truncate">{match.name}</h3>
+                  <div className="flex items-center gap-3 text-xs text-[#6c757d] mt-1">
                     <span>Pool: 🪙{pool}</span>
                     {myEntry?.slot && <span>Slot #{myEntry.slot}</span>}
                     {match.publishRoom && match.roomId && (
-                      <span className="text-green-600 font-bold">Room: {match.roomId}</span>
+                      <span className="text-[#28a745] font-bold">Room: {match.roomId}</span>
                     )}
                   </div>
                 </div>
-                <span className="text-primary text-xs font-bold shrink-0">→</span>
+                <span className="text-[#ff8c00] text-xs font-bold shrink-0">→</span>
               </div>
             </Link>
           );

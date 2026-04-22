@@ -49,7 +49,12 @@ export function WalletClient({ userId, winning, deposit, bonus }: Props) {
       // 2. APK ke WebView ke bajaye External Browser mein payment kholo
       const checkoutUrl = `https://battlepro.vercel.app/payment/checkout?orderId=${orderRes.order.id}&amount=${amt}&userId=${userId}`;
       
-      await Browser.open({ url: checkoutUrl });
+      // Fallback mechanism
+      try {
+        await Browser.open({ url: checkoutUrl });
+      } catch (pluginError) {
+        window.open(checkoutUrl, '_system');
+      }
 
       // Browser open hone ke baad spinner band kar do
       setLoading(false);

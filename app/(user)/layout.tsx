@@ -15,7 +15,7 @@ export default async function UserLayout({
   if (!userId) redirect("/login");
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex min-h-[100dvh] bg-background overflow-hidden">
       <AppStatusListener />
       <NotificationsProvider userId={userId} />
 
