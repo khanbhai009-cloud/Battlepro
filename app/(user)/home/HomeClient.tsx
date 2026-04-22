@@ -95,7 +95,7 @@ export default function HomeClient({
                     <SafeImage
                       src={match.banner}
                       alt={match.name}
-                      className="w-full h-24 object-cover rounded-xl mb-3"
+                      className="w-full h-24 object-cover rounded-2xl mb-3"
                     />
                   )}
                   <div className="flex justify-between items-start mb-2">
@@ -152,22 +152,22 @@ export default function HomeClient({
       {initialGames.length > 0 && (
         <div>
           <h2 className="text-base font-bold text-foreground mb-3">Esports Categories</h2>
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             {initialGames.map((game: any) => (
               <Link key={game.id} href={`/matches?category=${encodeURIComponent(game.name)}`}>
-                <div className="bg-white border border-border rounded-xl p-3 flex flex-col items-center gap-2 hover:border-primary/30 transition-all cursor-pointer">
+                <div className="bg-white border border-border rounded-2xl p-4 flex flex-col items-center gap-3 hover:border-primary/30 transition-all cursor-pointer">
                   {game.url ? (
                     <SafeImage
                       src={game.url}
                       alt={game.name}
-                      className="w-10 h-10 object-contain"
+                      className="w-full aspect-[16/9] object-cover rounded-2xl"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-xs font-black text-primary">
+                    <div className="w-full aspect-[16/9] rounded-2xl bg-primary/10 flex items-center justify-center text-xs font-black text-primary">
                       {(game.name ?? "?").slice(0, 2).toUpperCase()}
                     </div>
                   )}
-                  <span className="text-[11px] font-bold text-foreground text-center line-clamp-1">
+                  <span className="text-sm font-bold text-foreground text-center line-clamp-1 w-full">
                     {game.name}
                   </span>
                 </div>

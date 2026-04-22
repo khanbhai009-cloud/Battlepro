@@ -45,7 +45,9 @@ export default async function MatchDetailPage({ params }: { params: Promise<{ id
   return (
     <div className="space-y-5 max-w-2xl">
       {match.banner && (
-        <SafeImage src={match.banner} alt={match.name} className="w-full h-40 object-cover rounded-2xl" />
+        <div className="w-full aspect-[16/9] overflow-hidden rounded-2xl">
+          <SafeImage src={match.banner} alt={match.name} className="w-full h-full object-cover" />
+        </div>
       )}
 
       <div>

@@ -81,7 +81,7 @@ export function BottomNav() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border sm:hidden">
+      <nav className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-border rounded-2xl shadow-lg w-[92%] sm:hidden">
         <div className="flex justify-around items-center px-2 py-2 pb-[env(safe-area-inset-bottom,8px)]">
           {bottomNavItems.map((item) => {
             const Icon = item.icon;

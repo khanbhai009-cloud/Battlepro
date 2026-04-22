@@ -61,7 +61,7 @@ function MatchCard({ match, uid, userBalance }: { match: any; uid: string; userB
           <SafeImage
             src={match.banner}
             alt={match.name}
-            className="w-full h-28 object-cover rounded-xl mb-3"
+            className="w-full h-28 object-cover rounded-2xl mb-3"
           />
         )}
         <div className="flex justify-between items-start mb-3">
@@ -79,25 +79,19 @@ function MatchCard({ match, uid, userBalance }: { match: any; uid: string; userB
         <h3 className="text-sm font-bold mb-3 group-hover:text-primary transition-colors line-clamp-2">
           {match.name}
         </h3>
-        <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
-          <div>
-            <div className="text-muted text-[10px] font-bold uppercase">Pool</div>
+        <div className="flex justify-between text-xs mb-3">
+          <div className="text-center">
+            <div className="text-muted text-[10px] font-bold uppercase">Prize Pool</div>
             <div className="font-black text-foreground">🪙{pool}</div>
           </div>
-          <div>
-            <div className="text-muted text-[10px] font-bold uppercase">Entry</div>
+          <div className="text-center">
+            <div className="text-muted text-[10px] font-bold uppercase">Entry Fee</div>
             <div className="font-black text-foreground">🪙{fee}</div>
           </div>
           {match.perKill > 0 && (
-            <div>
+            <div className="text-center">
               <div className="text-muted text-[10px] font-bold uppercase">Per Kill</div>
               <div className="font-black text-green-600">🪙{match.perKill}</div>
-            </div>
-          )}
-          {match.map && (
-            <div>
-              <div className="text-muted text-[10px] font-bold uppercase">Map</div>
-              <div className="font-bold text-foreground truncate">{match.map}</div>
             </div>
           )}
         </div>
