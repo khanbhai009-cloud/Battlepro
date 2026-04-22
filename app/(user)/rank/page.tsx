@@ -24,11 +24,7 @@ export default async function RankPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Leaderboard</h1>
-        <p className="text-muted text-sm font-medium">Top players ranked by current month winnings.</p>
-      </div>
-
+     
       <div className="space-y-3">
         {players.map((player: any) => (
           <div 
